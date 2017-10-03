@@ -53,7 +53,7 @@ prevVals = [999,999]
 ## LOOP ##
 ##########
 while True:
-    obs.start()
+    obs.do()
 
     # Print all lights
     # print(lights)
