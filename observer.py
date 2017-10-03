@@ -1,4 +1,5 @@
 import com
+from pytradfri import error
 
 
 class Observer:
@@ -30,8 +31,14 @@ class Observer:
         'Get lamp info from gateway'
         # Select active device
         device = com.lights[self._device_id]
-        # Get active device data from gateway
-        com.api(device.update())
+
+        try:
+            # Get active device data from gateway
+            com.api(device.update())
+        except error.RequestTimeout:
+            print("Timeout error")
+            return self._prev
+
         # Select lamp
         light = device.light_control.lights[self._device_id]
         # Gather relevant lamp info and return

@@ -37,12 +37,9 @@ from observer import Observer
 # Lookup class setup
 data = Lookup()
 
-
-# exit()
-
-
 # Timecode class setup
 tc = TimeCode(minPerTimeCode=settings.minPerTimeCode)
+
 # Observer class setup for lamp 0
 obs = Observer(0)
 
@@ -73,7 +70,7 @@ while True:
         # Only set lamp state on timecode update flag to enable manually
         # turning the lamps back on after auto-change.
         if not obs.update:
-             data.setState( tc.get() )
+            data.setState( tc.get() )
 
         # Get new data from Lookup class
         vals = data.get( tc.get() )
