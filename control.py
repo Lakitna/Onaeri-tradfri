@@ -5,27 +5,27 @@ import com
 from pytradfri import error
 
 
-defaultTransitionTime = .5  # In seconds
+defaultTransitionTime = 1   # In seconds
 sendCommandsTries = 3       # In number of tries per command
 
 
 def state(val, lightIndex=None):
     # Turn one or more lamps on or off
-    if val == True or val == False:
+    if val is True or val is False:
         print("[Control] State change to", val)
         for l in _selectLights(lightIndex, state=True):
             command = l.light_control.set_state(val)
             _sendCommand(command)
     else:
-        print("[Control] state input value error")
+        print("[Control] state input value error. Allowed values 'True' or 'False'.")
         return False
 
 
 
 def color(val, lightIndex=None):
     # Update the color of one or more lamps
-    if val < 2200 or val > 4000:
-        print("[Control] color input value error")
+    if not 2200 <= val <= 4000:
+        print("[Control] color input value error. Allowed range 2200-4000, %d given." % val)
         return False
     else:
         for l in _selectLights(lightIndex):
@@ -36,8 +36,8 @@ def color(val, lightIndex=None):
 
 def brightness(val, lightIndex=None):
     # Update the brightness of one or more lamps
-    if val < 0 or val > 255:
-        print("[Control] brightness input value error")
+    if not 0 <= val <= 255:
+        print("[Control] brightness input value error. Allowed range 0-255, %d given." % val)
         return False
     else:
         for l in _selectLights(lightIndex):
@@ -58,17 +58,16 @@ def _sendCommand(command, *, iteration=1):
         com.api(command)
     except error.RequestTimeout:
         # Catch timeout errors and retry
-        print("[ERROR] Timeout on try ", iteration)
+        print("[Control] Timeout error on try ", iteration)
         if iteration < sendCommandsTries:
             _sendCommand(command, iteration=iteration+1)
         pass
     except KeyboardInterrupt:
         # Add opportunity to exit during superspeed mode
-        print("KeyboardInterrupt")
         exit()
     except:
         # Unexpected errors
-        print("[ERROR] ", sys.exc_info()[0])
+        print("[Control] Unexpected error: ", sys.exc_info()[0])
         print()
 
 
