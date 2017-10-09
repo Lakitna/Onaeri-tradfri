@@ -14,7 +14,7 @@ userAlarmTime    = (9, 30)      # Time alarm is set in (hour, minute)
 userAlarmOffset  = 30           # Wakeup phase offset in minutes
 
 # Bed time (evening)
-userSleepTime    = (0, 0)       # Bedtime in (hour, minute)
+userSleepTime    = (23, 30)       # Bedtime in (hour, minute)
 userWindDownTime = 30           # Wind down time before bed in minutes
 
 

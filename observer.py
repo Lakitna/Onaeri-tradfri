@@ -3,28 +3,44 @@ from pytradfri import error
 
 
 class Observer:
-    'Observe changes in light status'
+    'Observe changes in lamp'
     def __init__(self, device_id=0):
         self.update = True
         self._device_id = device_id
         self._prev = self._get_data()
+        self._legalChange = False
 
 
     def do(self):
-        'Get lamp info from gateway and check for changes'
+        'Check for changes in lamp values'
         # Get data from gateway
         new = self._get_data()
 
         # Unset update flag
         self.update = False
-        # Check if the lamp updated, set update flag if it did
-        for key in new:
-            if not self._prev[key] == new[key]:
-                self.update = True
-                print("[Observer] %s changed to %s" % (key, new[key]))
+
+        # Check if the lamp illegally updated, set update flag if it did
+        if not self._legalChange:
+            # If no legal change was reported:
+            for key in new:
+                # For all lamp values do:
+                if not self._prev[key] == new[key]:
+                    # If value has changed:
+                    if not (key == 'state' and not new[key]):
+                        # If lamp was not just turned off:
+                        self.update = True
+                        print("[Observer] Illegal change: %s changed to %s" % (key, new[key]))
+                        break
 
         # Prep for next iteration
         self._prev = new
+        self._legalChange = False
+
+
+    def notifyLegalChange(self):
+        'Prevent observer from overwriting legal changes'
+        # print("[Observer] Legal change incomming, ignoring next")
+        self._legalChange = True
 
 
     def _get_data(self):
@@ -36,7 +52,7 @@ class Observer:
             # Get active device data from gateway
             com.api(device.update())
         except error.RequestTimeout:
-            print("Timeout error")
+            print("[Observer] Timeout error: retrieving data from Gateway failed")
             return self._prev
 
         # Select lamp
