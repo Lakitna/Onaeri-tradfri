@@ -5,7 +5,7 @@ from pytradfri import Gateway, error
 from pytradfri.api.libcoap_api import api_factory
 
 
-print("Getting network data from gateway")
+print("Getting network data from gateway:")
 
 # Setup communication with the gateway
 try:
@@ -17,16 +17,16 @@ except error.RequestTimeout:
 
 
 gateway = Gateway()
-print(".")
+print("#", end="")
 
 
 # Get lamp network state and devices. Prep them for use
 devices_command = gateway.get_devices()
-print(".")
+print("#", end="")
 devices_commands = api(devices_command)
-print(".")
+print("#", end="")
 devices = api(*devices_commands)
-print("Done")
+print(" Done")
 print()
 
 

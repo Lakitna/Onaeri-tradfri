@@ -2,9 +2,7 @@
 """
 Awesome Tradfri controller for circadian rhythm improvement
 
-$ python3 Onaeri.py <IP> <KEY>
-Where <IP> is the address to your IKEA gateway and
-<KEY> is found on the back of your IKEA gateway.
+$ python3 Onaeri.py
 """
 
 
@@ -73,7 +71,7 @@ while True:
 
         # If the vals have changed or observer dictates update
         if not vals == prevVals or obs.update:
-            print("%s\t| bri: %d\t | color: %d" % (tc.decode(), vals[0], vals[1]))
+            print("[%s] Setting lamp to {bri: %d, color: %d}" % (tc.decode(), vals[0], vals[1]))
             # Change color
             control.color(settings.colorValues[ vals[1] ] )
             # Change brightness
