@@ -1,5 +1,5 @@
-import sys
-import time
+from sys import exc_info
+from time import sleep
 
 import com
 from pytradfri import error
@@ -45,7 +45,7 @@ def brightness(val, lightIndex=None):
             _sendCommand(command)
 
         # Wait for the duration of the transition
-        time.sleep( defaultTransitionTime * 1.1 )
+        sleep( defaultTransitionTime * 1.1 )
 
 
 
@@ -67,7 +67,7 @@ def _sendCommand(command, *, iteration=1):
         exit()
     except:
         # Unexpected errors
-        print("[Control] Unexpected error: ", sys.exc_info()[0])
+        print("[Control] Unexpected error: ", exc_info()[0])
         print()
 
 
@@ -78,7 +78,7 @@ def _selectLights(lightIndex, *, state=False):
         ret = []
         for i in range(len(com.lights)):
             # Ignore lights that are off with exception for changing lamp state
-            if com.lights[i].light_control.lights[i].state or state:
+            if com.lights[i].light_control.lights[0].state or state:
                 ret.append(com.lights[i])
         return ret
     else:
@@ -87,7 +87,7 @@ def _selectLights(lightIndex, *, state=False):
         for i in lightIndex:
             try:
                 # Ignore lights that are off with exception for changing lamp state
-                if com.lights[i].light_control.lights[i].state or state:
+                if com.lights[i].light_control.lights[0].state or state:
                     ret.append(com.lights[i])
             except IndexError:
                 print("[Control] Selected lamp #%d is unkown" % i)
