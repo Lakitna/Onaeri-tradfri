@@ -1,18 +1,16 @@
 import time
-import math
+from settings import minPerTimeCode
 
 
 class TimeCode:
     'Handles timekeeping in timecodes'
-    def __init__(self, *, superspeed=None, minPerTimeCode=1):
+    def __init__(self, *, superspeed=None):
         self._minPerTimeCode = minPerTimeCode
         self._dataPoints = (24*60) / self._minPerTimeCode
         self._superspeed = superspeed
         self._superspeedCounter = round(self._dataPoints * .37)
         self._code = self.make()
-
-    def __del__(self):
-        print("[Timecode] Garbage collection")
+        self.update = False
 
 
     def get(self):
@@ -26,12 +24,12 @@ class TimeCode:
             time.sleep(1)
 
 
-    def update(self):
-        'Update current timecode and return a changed flag'
+    def tick(self):
+        'Update current timecode and set update flag on new code'
         if self._code == self.make():
-            return False
+            self.update = False
         else:
-            return True
+            self.update = True
 
 
     def make(self, h=None, m=None):
@@ -56,8 +54,9 @@ class TimeCode:
                 m = h[1]
                 h = h[0]
 
-            self._code = math.floor( ( (h*60) + m ) / self._minPerTimeCode )
+            self._code = ( (h*60) + m ) // self._minPerTimeCode
             return self._code
+
 
     def decode(self, code=None):
         'Return the timestring linked to a timecode'
@@ -65,7 +64,7 @@ class TimeCode:
             code = self._code
 
         minutes = code * self._minPerTimeCode
-        h = math.floor(minutes / 60)
-        m = math.floor(minutes % 60)
+        h = minutes // 60
+        m = minutes % 60
 
         return "%02d:%02d" % (h,m)

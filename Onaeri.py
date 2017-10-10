@@ -14,17 +14,9 @@ __author__ = 'Sander van Beek'
 print("\n" * 100)
 
 
-# Standard modules
-import time
-
-# Custom modules
-import settings
-import com
-import control
+from time import sleep
 from timecode import TimeCode
-from lookup import Lookup
-from observer import Observer
-
+from cycle import Cycle
 
 
 
@@ -32,24 +24,32 @@ from observer import Observer
 ###########
 ## SETUP ##
 ###########
-# Lookup class setup
-data = Lookup()
-
 # Timecode class setup
-tc = TimeCode(minPerTimeCode=settings.minPerTimeCode)
+# tc = TimeCode(minPerTimeCode=settings.minPerTimeCode)
+tc = TimeCode()
 
-# Observer class setup for lamp 0
-obs = Observer(0)
+# Setup the cycles
+cycleA = Cycle([0])
+cycleB = Cycle([1], wakeTime=(6,30), sleepTime=(22,0))
 
-# Make list to keep track of value changes
-prevVals = [999,999]
+
 
 ##########
 ## LOOP ##
 ##########
 while True:
-    obs.do()
+    # Tick timecode
+    tc.tick()
 
+    # Tick cycles
+    cycleA.tick( tc )
+    cycleB.tick( tc )
+
+    # Slow down a bit, no stress brah
+    sleep(1)
+
+
+    # Temporary api documentation
     # Print all lights
     # print(lights)
 
@@ -61,37 +61,3 @@ while True:
     # print("State: ", light.light_control.lights[0].state)
     # print("Dimmer level: ", light.light_control.lights[0].dimmer)
     # print()
-
-    timeCodeUpdate = tc.update()
-
-    # If new timecode or observer dictates update
-    if timeCodeUpdate or obs.update:
-        # Get new data from Lookup class
-        vals = data.get( tc.get() )
-
-        # If the vals have changed or observer dictates update
-        if not vals == prevVals or obs.update:
-            print("[%s] Setting lamp to {bri: %d, color: %d}" % (tc.decode(), vals[0], vals[1]))
-            # Change color
-            control.color(settings.colorValues[ vals[1] ] )
-            # Change brightness
-            control.brightness( vals[0] )
-
-            # Prevent observer from overturning legal changes.
-            obs.notifyLegalChange()
-
-
-        # Only set lamp state on timecode update flag to enable manually
-        # turning the lamps back on after auto-change.
-        if timeCodeUpdate:
-            if data.setState( tc.get() ):
-                # Prevent observer from overturning legal changes.
-                obs.notifyLegalChange()
-
-
-        # Prep for next loop
-        prevVals = vals
-
-
-    # Slow down a bit, no stress brah
-    time.sleep(1)

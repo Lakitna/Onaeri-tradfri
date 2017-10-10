@@ -6,9 +6,14 @@ import settings
 
 class Lookup:
     'Calculates and dispenses lookup tables for light values'
-    def __init__(self):
+    def __init__(self, wake=None, sleep=None):
+        if wake is None:
+            wake = settings.userAlarmTime
+        if sleep is None:
+            sleep = settings.userSleepTime
+
         # Make a timecode object to calculate timecodes later
-        tc = timecode.TimeCode(minPerTimeCode=settings.minPerTimeCode);
+        tc = timecode.TimeCode();
 
         # Calculate the limits of brightness and color based on self._settings
         self.briLimit = [0,0]
@@ -36,11 +41,11 @@ class Lookup:
             )
 
         # Apply offset and sleep rhythm self._settings
-        self._userAlarmTime = tc.make(settings.userAlarmTime)
+        self._userAlarmTime = tc.make(wake)
         self._userAlarmOffset = settings.userAlarmOffset \
                                 // settings.minPerTimeCode
 
-        self._userSleepTime = tc.make( settings.userSleepTime )
+        self._userSleepTime = tc.make( sleep )
         self._userWindDownTime = settings.userWindDownTime \
                                 // settings.minPerTimeCode
 
@@ -76,15 +81,15 @@ class Lookup:
         # print()
         # print(self.color)
 
-    def setState(self, code):
+    def setState(self, code, lightIndex):
         'Set lamp on/off state based on timecode'
         if code == self._userAlarmTime - self._userAlarmOffset:
-            control.state(True)
+            control.state(True, lightIndex)
             time.sleep(1)
             return True
 
         if code == self._userSleepTime:
-            control.state(False)
+            control.state(False, lightIndex)
             time.sleep(1)
             return True
 

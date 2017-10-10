@@ -29,7 +29,7 @@ class Observer:
                     if not (key == 'state' and not new[key]):
                         # If lamp was not just turned off:
                         self.update = True
-                        print("[Observer] Illegal change: %s changed to %s" % (key, new[key]))
+                        print("[Observer] Illegal change in %d: %s changed to %s" % (self._device_id, key, new[key]))
                         break
 
         # Prep for next iteration
@@ -56,6 +56,6 @@ class Observer:
             return self._prev
 
         # Select lamp
-        light = device.light_control.lights[self._device_id]
+        light = device.light_control.lights[0]
         # Gather relevant lamp info and return
         return {'state': light.state, 'bright': light.dimmer, 'color': light.kelvin_color}
