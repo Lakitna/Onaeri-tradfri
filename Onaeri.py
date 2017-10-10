@@ -2,6 +2,10 @@
 """
 Awesome Tradfri controller for circadian rhythm improvement
 
+Source:
+https://github.com/Lakitna/Onaeri-tradfri
+
+To run execute command:
 $ python3 Onaeri.py
 """
 
@@ -12,6 +16,8 @@ __author__ = 'Sander van Beek'
 
 # Clear terminal
 print("\n" * 100)
+print("Onaeri Tradfri v%s" % __version__)
+print()
 
 
 from time import sleep
@@ -25,7 +31,6 @@ from cycle import Cycle
 ## SETUP ##
 ###########
 # Timecode class setup
-# tc = TimeCode(minPerTimeCode=settings.minPerTimeCode)
 tc = TimeCode()
 
 # Setup the cycles

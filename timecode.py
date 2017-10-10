@@ -1,4 +1,4 @@
-import time
+from time import localtime
 from settings import minPerTimeCode
 
 
@@ -16,12 +16,6 @@ class TimeCode:
     def get(self):
         'Get latest timecode'
         return self._code
-
-
-    def sleep(self):
-        'Sleep until next timecode'
-        while not self.update():
-            time.sleep(1)
 
 
     def tick(self):
@@ -47,9 +41,9 @@ class TimeCode:
         else:
             # Normal realtime mode
             if (h == None):
-                h = time.localtime().tm_hour
+                h = localtime().tm_hour
             if (m == None):
-                m = time.localtime().tm_min
+                m = localtime().tm_min
             if isinstance(h, tuple):
                 m = h[1]
                 h = h[0]
@@ -59,8 +53,8 @@ class TimeCode:
 
 
     def decode(self, code=None):
-        'Return the timestring linked to a timecode'
-        if code == None:
+        'Return the timestring associated with a timecode'
+        if code is None:
             code = self._code
 
         minutes = code * self._minPerTimeCode

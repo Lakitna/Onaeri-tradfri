@@ -1,4 +1,4 @@
-import com
+from com import lights, api
 from pytradfri import error
 
 
@@ -46,11 +46,11 @@ class Observer:
     def _get_data(self):
         'Get lamp info from gateway'
         # Select active device
-        device = com.lights[self._device_id]
+        device = lights[self._device_id]
 
         try:
             # Get active device data from gateway
-            com.api(device.update())
+            api(device.update())
         except error.RequestTimeout:
             print("[Observer] Timeout error: retrieving data from Gateway failed")
             return self._prev

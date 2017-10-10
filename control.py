@@ -1,5 +1,5 @@
-import sys
-import time
+from sys import exc_info
+from time import sleep
 
 import com
 from pytradfri import error
@@ -45,7 +45,7 @@ def brightness(val, lightIndex=None):
             _sendCommand(command)
 
         # Wait for the duration of the transition
-        time.sleep( defaultTransitionTime * 1.1 )
+        sleep( defaultTransitionTime * 1.1 )
 
 
 
@@ -67,7 +67,7 @@ def _sendCommand(command, *, iteration=1):
         exit()
     except:
         # Unexpected errors
-        print("[Control] Unexpected error: ", sys.exc_info()[0])
+        print("[Control] Unexpected error: ", exc_info()[0])
         print()
 
 
