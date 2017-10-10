@@ -1,52 +1,61 @@
-import threading
-import time
 import com
+from pytradfri import error
 
 
 class Observer:
-    'Observe changes in light status'
+    'Observe changes in lamp'
     def __init__(self, device_id=0):
-        self._active = False
-        self._prevState = False
         self.update = True
         self._device_id = device_id
+        self._prev = self._get_data()
+        self._legalChange = False
 
 
-    def start(self):
-        'Start observer if it is not active'
-        if self._active == False:
-            self._observe()
+    def do(self):
+        'Check for changes in lamp values'
+        # Get data from gateway
+        new = self._get_data()
 
-    def _observe(self):
-        self._active = True
+        # Unset update flag
+        self.update = False
 
+        # Check if the lamp illegally updated, set update flag if it did
+        if not self._legalChange:
+            # If no legal change was reported:
+            for key in new:
+                # For all lamp values do:
+                if not self._prev[key] == new[key]:
+                    # If value has changed:
+                    if not (key == 'state' and not new[key]):
+                        # If lamp was not just turned off:
+                        self.update = True
+                        print("[Observer] Illegal change: %s changed to %s" % (key, new[key]))
+                        break
+
+        # Prep for next iteration
+        self._prev = new
+        self._legalChange = False
+
+
+    def notifyLegalChange(self):
+        'Prevent observer from overwriting legal changes'
+        # print("[Observer] Legal change incomming, ignoring next")
+        self._legalChange = True
+
+
+    def _get_data(self):
+        'Get lamp info from gateway'
+        # Select active device
         device = com.lights[self._device_id]
 
-        def callback(updated_device):
-            # Callback if observer noticed a change in the lamps parameters
-            light = updated_device.light_control.lights[self._device_id]
-            newState = light.state
+        try:
+            # Get active device data from gateway
+            com.api(device.update())
+        except error.RequestTimeout:
+            print("[Observer] Timeout error: retrieving data from Gateway failed")
+            return self._prev
 
-            # If the lamp state changed set update flag
-            if not self._prevState == newState and newState == True:
-                self.update = True
-            else:
-                self.update = False
-
-            # Print new parameters to the console
-            print("[Observer] <#%d\t| On: %s\t| Bri: %d\t| Color: %s | Update: %s>" % (light.index, light.state, light.dimmer, light.xy_color, self.update))
-
-            # Prep for next instance
-            prevState = newState
-
-        def err_callback(err):
-            # Catch errors
-            print("[Observer] %s" % err)
-            self._active = False
-
-        def worker():
-            com.api(device.observe(callback, err_callback, duration=1000))
-
-        threading.Thread(target=worker, daemon=True).start()
-        print("[Observer] Observing started.")
-        time.sleep(1)
+        # Select lamp
+        light = device.light_control.lights[self._device_id]
+        # Gather relevant lamp info and return
+        return {'state': light.state, 'bright': light.dimmer, 'color': light.kelvin_color}

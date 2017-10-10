@@ -6,7 +6,7 @@ $ python3 Onaeri.py
 """
 
 
-__version__ = '0.0'
+__version__ = '0.1'
 __author__ = 'Sander van Beek'
 
 
@@ -35,12 +35,9 @@ from observer import Observer
 # Lookup class setup
 data = Lookup()
 
-
-# exit()
-
-
 # Timecode class setup
 tc = TimeCode(minPerTimeCode=settings.minPerTimeCode)
+
 # Observer class setup for lamp 0
 obs = Observer(0)
 
@@ -51,7 +48,7 @@ prevVals = [999,999]
 ## LOOP ##
 ##########
 while True:
-    obs.start()
+    obs.do()
 
     # Print all lights
     # print(lights)
@@ -65,14 +62,10 @@ while True:
     # print("Dimmer level: ", light.light_control.lights[0].dimmer)
     # print()
 
+    timeCodeUpdate = tc.update()
 
     # If new timecode or observer dictates update
-    if tc.update() or obs.update:
-        # Only set lamp state on timecode update flag to enable manually
-        # turning the lamps back on after auto-change.
-        if not obs.update:
-             data.setState( tc.get() )
-
+    if timeCodeUpdate or obs.update:
         # Get new data from Lookup class
         vals = data.get( tc.get() )
 
@@ -84,10 +77,20 @@ while True:
             # Change brightness
             control.brightness( vals[0] )
 
+            # Prevent observer from overturning legal changes.
+            obs.notifyLegalChange()
+
+
+        # Only set lamp state on timecode update flag to enable manually
+        # turning the lamps back on after auto-change.
+        if timeCodeUpdate:
+            if data.setState( tc.get() ):
+                # Prevent observer from overturning legal changes.
+                obs.notifyLegalChange()
+
 
         # Prep for next loop
         prevVals = vals
-        obs.update = False
 
 
     # Slow down a bit, no stress brah

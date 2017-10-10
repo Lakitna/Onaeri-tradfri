@@ -81,10 +81,15 @@ class Lookup:
         if code == self._userAlarmTime - self._userAlarmOffset:
             control.state(True)
             time.sleep(1)
+            return True
 
         if code == self._userSleepTime:
             control.state(False)
             time.sleep(1)
+            return True
+
+        return False
+
 
 
     def get(self, code):
