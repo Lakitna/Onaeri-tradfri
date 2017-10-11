@@ -7,6 +7,8 @@ import settings
 class Lookup:
     'Calculates and dispenses lookup tables for light values'
     def __init__(self):
+        print("Building lookup table: ", end="")
+
         # Make a timecode object to calculate timecodes later
         tc = timecode.TimeCode(minPerTimeCode=settings.minPerTimeCode);
 
@@ -71,7 +73,7 @@ class Lookup:
         # Build color lookup table based on colorData and user self._settings
         self.color = self._buildTable(settings.colorData)
 
-
+        print("Done")
         # print(self.brightness)
         # print()
         # print(self.color)

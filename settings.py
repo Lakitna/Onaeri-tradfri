@@ -94,6 +94,8 @@ def checkVal(val, rmin=0, rmax=1, *, check=None):
 
 
 
+print("Validating settings: ", end="")
+
 checkVal(briCorrect, 0, 100)
 checkVal(briRange, 1, 254)
 checkVal(colorCorrect, 0, 100)
@@ -114,3 +116,5 @@ checkVal(colorData['day'], 0, 100)
 checkVal(colorData['night'], 0, 100)
 checkVal(morningSlopeDuration, check="unsigned")
 checkVal(eveningSlopeDuration, check="unsigned")
+
+print("Done")

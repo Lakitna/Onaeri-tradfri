@@ -44,6 +44,10 @@ obs = Observer(0)
 # Make list to keep track of value changes
 prevVals = [999,999]
 
+# Start message
+print("Onaeri is now active")
+print()
+
 ##########
 ## LOOP ##
 ##########
