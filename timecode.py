@@ -4,15 +4,12 @@ import math
 
 class TimeCode:
     'Handles timekeeping in timecodes'
-    def __init__(self, *, superspeed=None, minPerTimeCode=1):
+    def __init__(self, superspeed=None, minPerTimeCode=1):
         self._minPerTimeCode = minPerTimeCode
-        self._dataPoints = (24*60) / self._minPerTimeCode
+        self._dataPoints = round( (24*60) // minPerTimeCode )
         self._superspeed = superspeed
         self._superspeedCounter = round(self._dataPoints * .37)
         self._code = self.make()
-
-    def __del__(self):
-        print("[Timecode] Garbage collection")
 
 
     def get(self):
@@ -34,7 +31,7 @@ class TimeCode:
             return True
 
 
-    def make(self, h=None, m=None):
+    def make(self, h=None, m=None, s=None):
         'Calculate a new timecode'
         if(self._superspeed != None):
             # Superspeed mode for devellopment
@@ -52,12 +49,17 @@ class TimeCode:
                 h = time.localtime().tm_hour
             if (m == None):
                 m = time.localtime().tm_min
+            if (s == None):
+                s = time.localtime().tm_sec
             if isinstance(h, tuple):
                 m = h[1]
+                if len(h) > 2:
+                    s = h[2]
                 h = h[0]
 
-            self._code = math.floor( ( (h*60) + m ) / self._minPerTimeCode )
+            self._code = math.floor( ( (h*60) + m + (s/60) ) // self._minPerTimeCode )
             return self._code
+
 
     def decode(self, code=None):
         'Return the timestring linked to a timecode'
@@ -67,5 +69,6 @@ class TimeCode:
         minutes = code * self._minPerTimeCode
         h = math.floor(minutes / 60)
         m = math.floor(minutes % 60)
+        s = math.floor( (minutes % 1) * 60 )
 
-        return "%02d:%02d" % (h,m)
+        return "%02d:%02d:%02d" % (h,m,s)
