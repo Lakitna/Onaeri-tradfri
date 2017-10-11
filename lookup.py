@@ -72,9 +72,9 @@ class Lookup:
         self.color = self._buildTable(settings.colorData)
 
 
-        print(self.brightness)
-        print()
-        print(self.color)
+        # print(self.brightness)
+        # print()
+        # print(self.color)
 
 
     def setState(self, code):
