@@ -78,7 +78,7 @@ def _selectLights(lightIndex, *, state=False):
         ret = []
         for i in range(len(com.lights)):
             # Ignore lights that are off with exception for changing lamp state
-            if com.lights[i].light_control.lights[i].state or state:
+            if com.lights[i].light_control.lights[0].state or state:
                 ret.append(com.lights[i])
         return ret
     else:
@@ -87,7 +87,7 @@ def _selectLights(lightIndex, *, state=False):
         for i in lightIndex:
             try:
                 # Ignore lights that are off with exception for changing lamp state
-                if com.lights[i].light_control.lights[i].state or state:
+                if com.lights[i].light_control.lights[0].state or state:
                     ret.append(com.lights[i])
             except IndexError:
                 print("[Control] Selected lamp #%d is unkown" % i)

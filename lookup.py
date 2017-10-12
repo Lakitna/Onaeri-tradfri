@@ -6,7 +6,9 @@ import settings
 
 class Lookup:
     'Calculates and dispenses lookup tables for light values'
-    def __init__(self, wake=settings.userAlarmTime, sleep=settings.userSleepTime):
+    def __init__(self):
+        print("Building lookup table: ", end="")
+
         # Make a timecode object to calculate timecodes later
         tc = timecode.TimeCode();
 
@@ -36,42 +38,42 @@ class Lookup:
             )
 
         # Apply offset and sleep rhythm self._settings
-        self._userAlarmTime = tc.make(wake)
-        self._userAlarmOffset = settings.userAlarmOffset \
-                                // settings.minPerTimeCode
+        self._userAlarmTime = tc.make(settings.userAlarmTime)
+        self._userAlarmOffset = round(
+                settings.userAlarmOffset \
+                // settings.minPerTimeCode
+            )
 
-        self._userSleepTime = tc.make( sleep )
-        self._userWindDownTime = settings.userWindDownTime \
-                                // settings.minPerTimeCode
+        self._userSleepTime = tc.make( settings.userSleepTime )
+        self._userWindDownTime = round(
+                settings.userWindDownTime \
+                // settings.minPerTimeCode
+            )
 
         # Create morning and evening slopes based on sleep rhythm self._settings
         self._userMorningSlope = [0,0]
         self._userMorningSlope[0] = self._userAlarmTime - self._userAlarmOffset
         self._userMorningSlope[1] = self._userMorningSlope[0] \
-                                    + (settings.morningSlope[1] - settings.morningSlope[0])
+                                    + settings.morningSlopeDuration
 
         self._userEveningSlope = [0,0,0,0]
         self._userEveningSlope[0] = self._userSleepTime \
-                                    - (settings.eveningSlope[1] - settings.eveningSlope[0])
+                                    - settings.eveningSlopeDuration
         self._userEveningSlope[1] = self._userSleepTime
         self._userEveningSlope[2] = self._userEveningSlope[0]
-        self._userEveningSlope[3] = self._userEveningSlope[1]
         if self._userEveningSlope[0] < 0:
             self._userEveningSlope[2] += settings.totalDataPoints
-            self._userEveningSlope[3] += settings.totalDataPoints
+            self._userEveningSlope[3] = settings.totalDataPoints
+            self._userEveningSlope[0] = 0
 
 
         # Build brightness lookup table based on brightnessData and user self._settings
-        self.brightness = []
-        for code in range(settings.totalDataPoints):
-            self.brightness.append( settings.brightnessData[ self._shift(code) ] )
+        self.brightness = self._buildTable(settings.brightnessData)
 
         # Build color lookup table based on colorData and user self._settings
-        self.color = []
-        for code in range(settings.totalDataPoints):
-            self.color.append( settings.colorData[ self._shift(code) ] )
+        self.color = self._buildTable(settings.colorData)
 
-
+        print("Done")
         # print(self.brightness)
         # print()
         # print(self.color)
@@ -108,23 +110,74 @@ class Lookup:
 
 
 
-    def _shift(self, code):
-        # Ingest a timecode and return a shifted one based on user self._settings
-        if self._userMorningSlope[0] <= code and code <= self._userMorningSlope[1]:
-            # Morning slope
-            return settings.morningSlope[0] + (code - self._userMorningSlope[0])
+    def _buildTable(self, source):
+        'Build a lookup table based on settings and a given data source'
+        def resize(src, length):
+            'Resize a data sequence, shrinking is more effective than expanding'
+            srcLen = len(src)
 
-        if self._userEveningSlope[0] <= code and code <= self._userEveningSlope[1]:
-            # Evening slope
-            return settings.eveningSlope[0] + (code - self._userEveningSlope[0])
+            out = []
+            for i in range(length):
+                x = round(i * (srcLen/length) )
+                if x >= srcLen:
+                    x = srcLen-1
 
-        if self._userEveningSlope[2] <= code and code <= self._userEveningSlope[3]:
-            # Evening slope with 0 hour rollover
-            return settings.eveningSlope[0] + (code - self._userEveningSlope[2])
+                out.append(src[x])
+            return out
 
-        if self._userMorningSlope[1] < code and code < self._userEveningSlope[2]:
-            # Day flat
-            return settings.dayFlat
 
-        # Night flat or fallback
-        return settings.nightFlat
+        # Some vars for eveningSlope 0 hour rollover functionality
+        eveningTotal = settings.eveningSlopeDuration
+        eveningRolloverOffset = self._userEveningSlope[1] - self._userEveningSlope[0]
+
+        # Resize morningSlope
+        source['morning'] = resize( source['morning'], settings.morningSlopeDuration)
+        # Resize eveningSlope
+        source['evening'] = resize( source['evening'], eveningTotal)
+
+        # Create data holder for lookup table
+        table = []
+        # Make a counter for eveningSlope
+        eveningCodeCounter = 0
+        for code in range(settings.totalDataPoints):
+            # For every timecode in lookup table do:
+            if self._userMorningSlope[0] <= code < self._userMorningSlope[1]:
+                # If morningSlope:
+                data = source['morning']
+                table.append( data[code - self._userMorningSlope[0]] )
+                # print('%s\tmorning %s\t%s' % (code, code - self._userMorningSlope[0], data[code - self._userMorningSlope[0]]))
+                continue
+
+
+            elif self._userEveningSlope[0] <= code < self._userEveningSlope[1]:
+                # If eveningSlope (0 hour rollover):
+                data = source['evening']
+                table.append( data[eveningTotal - eveningRolloverOffset + eveningCodeCounter] )
+                # print('%s\tevening %s\t%s' % (code, eveningTotal-length+eveningCodeCounter, data[eveningTotal-length+eveningCodeCounter]))
+
+                eveningCodeCounter += 1
+                continue
+
+            elif self._userEveningSlope[2] <= code <= self._userEveningSlope[3]:
+                # If eveningSlope (no rollover):
+                data = source['evening']
+                table.append( data[eveningCodeCounter - eveningRolloverOffset] )
+                # print('%s\tevening %s\t%s' % (code, eveningCodeCounter-rolloverOffset, data[eveningCodeCounter-rolloverOffset]))
+
+                eveningCodeCounter += 1
+                continue
+
+
+            elif self._userMorningSlope[1] <= code < self._userEveningSlope[2]:
+                # If dayFlat:
+                table.append( source['day'] )
+                # print('%s\tday %s\t%s' % (code, 0, data))
+                continue
+
+            else:
+                # Else it's night:
+                table.append( source['night'] )
+                # print('%s\tnight %s\t%s' % (code, 0, data))
+                continue
+
+        return table

@@ -39,6 +39,10 @@ cycleB = Cycle([1], wakeTime=(6,30), sleepTime=(22,0))
 
 
 
+# Start message
+print("Onaeri is now active")
+print()
+
 ##########
 ## LOOP ##
 ##########
