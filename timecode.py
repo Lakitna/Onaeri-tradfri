@@ -1,5 +1,6 @@
 from time import localtime
 from settings import minPerTimeCode
+from math import floor
 
 
 class TimeCode:
@@ -43,16 +44,16 @@ class TimeCode:
             if (h == None):
                 h = localtime().tm_hour
             if (m == None):
-                m = time.localtime().tm_min
+                m = localtime().tm_min
             if (s == None):
-                s = time.localtime().tm_sec
+                s = localtime().tm_sec
             if isinstance(h, tuple):
                 m = h[1]
                 if len(h) > 2:
                     s = h[2]
                 h = h[0]
 
-            self._code = math.floor( ( (h*60) + m + (s/60) ) // self._minPerTimeCode )
+            self._code = floor( ( (h*60) + m + (s/60) ) // self._minPerTimeCode )
             return self._code
 
 
@@ -62,8 +63,8 @@ class TimeCode:
             code = self._code
 
         minutes = code * self._minPerTimeCode
-        h = math.floor(minutes / 60)
-        m = math.floor(minutes % 60)
-        s = math.floor( (minutes % 1) * 60 )
+        h = floor( minutes / 60 )
+        m = floor( minutes % 60 )
+        s = floor( (minutes % 1) * 60 )
 
         return "%02d:%02d:%02d" % (h,m,s)

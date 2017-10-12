@@ -6,7 +6,7 @@ import settings
 
 class Lookup:
     'Calculates and dispenses lookup tables for light values'
-    def __init__(self):
+    def __init__(self, wakeTime=settings.userAlarmTime, sleepTime=settings.userSleepTime):
         print("Building lookup table: ", end="")
 
         # Make a timecode object to calculate timecodes later
