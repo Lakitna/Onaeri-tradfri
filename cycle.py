@@ -5,53 +5,45 @@ from observer import Observer
 
 
 class Cycle:
-    'Cycle a group of lamps'
+    """
+    Cycle a group of lamps
+    """
     def __init__(self, group, wakeTime=settings.userAlarmTime, sleepTime=settings.userSleepTime):
         self.group = group
-        # Lookup class setup
-        self.data = Lookup( wakeTime, sleepTime )
-        # Observer class setup for first lamp in group
-        self.obs = Observer( self.group[0] )
-        # Make list to keep track of value changes
-        self._prevVals = [999,999]
+        self.lookup = Lookup( wakeTime, sleepTime )
+        self.observer = Observer( self.group[0] ) # Always observe first lamp in group
+
+        self._prevVals = [0,0]
 
 
-    def tick(self, tc):
-        'Progress cycle'
-        # Observe changes
-        self.obs.do()
+    def tick(self, timeKeeper):
+        """
+        Progress cycle.
+        """
+        self.observer.look()
 
-        # If new timecode or observer dictates update
-        if tc.update or self.obs.update:
-            # Get new data from Lookup class
-            vals = self.data.get( tc.get() )
+        if timeKeeper.update or self.observer.update:
+            newVals = self.lookup.table( timeKeeper.timeCode )
 
             # If the vals have changed or observer dictates update
-            if not vals == self._prevVals or self.obs.update:
-                print("[%s] Setting lamp %s to {bri: %d, color: %d}" % (tc.decode(), self.group, vals[0], vals[1]))
-                # Set lamp values
-                self._setVals(vals)
-                # Prevent observer from overturning legal changes.
-                self.obs.notifyLegalChange()
-
-
-            # Only set lamp state on timecode update flag to enable manually
-            # turning the lamps back on after auto-change.
-            if tc.update:
-                if self.data.setState( tc.get(), self.group ):
-                    # Prevent observer from overturning legal changes.
-                    self.obs.notifyLegalChange()
-
+            if (not newVals == self._prevVals) or self.observer.update:
+                self._update(newVals)
+                print("[%s] Setting lamp %s to {bri: %d, color: %d}" % (timeKeeper.timeStamp(), self.group, newVals['brightness'], newVals['color']))
 
             # Prep for next loop
-            self._prevVals = vals
+            self._prevVals = newVals
 
 
+    def _update(self, vals):
+        """
+        Updates lamps in cycle group to new values.
+        """
+        control.color( settings.colorValues[ vals['color'] ], self.group )
+        control.brightness( vals['brightness'], self.group )
 
+        # Don't allow the observer to overwrite turning on a lamp
+        if not self.observer.update and vals['power'] is not None:
+            control.state( vals['power'] )
 
-    def _setVals(self, v):
-        'Set lamp values'
-        # Change color
-        control.color( settings.colorValues[ v[1] ], self.group )
-        # Change brightness
-        control.brightness( v[0], self.group )
+        # Prevent observer from overturning legal changes.
+        self.observer.legalChange()

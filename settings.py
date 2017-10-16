@@ -28,6 +28,10 @@ morningSlopeDuration = 60       # Duration of morningslope in minutes
 eveningSlopeDuration = 500      # Duration of eveningslope in minutes
 
 
+# Transition
+defaultTransitionTime = 1       # Transition time in seconds
+
+
 #####################
 # Advanced settings #
 #####################
@@ -36,8 +40,9 @@ briRange         = (1, 254)     # [min, max] brightness in val
 colorRange       = (0, 13)      # [min, max] color temp in val
 colorValues = (2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3200, 3400, 3600, 3800, 4000) # In Kelvin
 
-minPerTimeCode   = 1            # Minutes per datapoint
+minPerTimeCode   = .25            # Minutes per datapoint
 
+sendCommandsTries = 3           # Amount of times the controller tries to send a command before giving up.
 
 
 # Calculated settings
@@ -94,8 +99,7 @@ def checkVal(val, rmin=0, rmax=1, *, check=None):
 
 
 
-print("Validating settings: ", end="")
-
+print("Validating settings: ", end='', flush=True)
 checkVal(briCorrect, 0, 100)
 checkVal(briRange, 1, 254)
 checkVal(colorCorrect, 0, 100)

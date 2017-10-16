@@ -1,4 +1,4 @@
-print("Getting network data from gateway: ", end="")
+print("Getting network data from gateway: ", end="", flush=True)
 
 import settings
 

@@ -20,8 +20,8 @@ print("Onaeri Tradfri v%s" % __version__)
 print()
 
 
-from time import sleep
-from timecode import TimeCode
+import time
+from timekeeper import TimeKeeper
 from cycle import Cycle
 
 
@@ -31,7 +31,7 @@ from cycle import Cycle
 ## SETUP ##
 ###########
 # Timecode class setup
-tc = TimeCode()
+timeKeeper = TimeKeeper()
 
 # Setup the cycles
 cycleA = Cycle([0])
@@ -43,19 +43,20 @@ cycleB = Cycle([1], wakeTime=(6,30), sleepTime=(22,0))
 print("Onaeri is now active")
 print()
 
+
 ##########
 ## LOOP ##
 ##########
 while True:
     # Tick timecode
-    tc.tick()
+    timeKeeper.tick()
 
     # Tick cycles
-    cycleA.tick( tc )
-    cycleB.tick( tc )
+    cycleA.tick( timeKeeper )
+    cycleB.tick( timeKeeper )
 
     # Slow down a bit, no stress brah
-    sleep(1)
+    time.sleep(1)
 
 
     # Temporary api documentation
