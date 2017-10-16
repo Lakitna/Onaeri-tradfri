@@ -10,7 +10,7 @@ $ python3 Onaeri.py
 """
 
 
-__version__ = '0.1'
+__version__ = '0.2'
 __author__ = 'Sander van Beek'
 
 
@@ -34,26 +34,28 @@ from cycle import Cycle
 timeKeeper = TimeKeeper()
 
 # Setup the cycles
-cycleA = Cycle([0])
-cycleB = Cycle([1], wakeTime=(6,30), sleepTime=(22,0))
-
+cycleA = Cycle([1], settingFile="Sander")
+cycleB = Cycle([0], settingFile="Jurrien")
 
 
 # Start message
 print("Onaeri is now active")
 print()
 
-
 ##########
 ## LOOP ##
 ##########
 while True:
-    # Tick timecode
-    timeKeeper.tick()
+    # Some monitoring stuff
+    print(">", end="", flush=True)
+    if timeKeeper.update:  print()
 
     # Tick cycles
     cycleA.tick( timeKeeper )
     cycleB.tick( timeKeeper )
+
+
+    timeKeeper.tick()
 
     # Slow down a bit, no stress brah
     time.sleep(1)

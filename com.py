@@ -1,6 +1,6 @@
-print("Getting network data from gateway: ", end="", flush=True)
+import settings.Global as settings
 
-import settings
+print("Getting network data from gateway: ", end="", flush=True)
 
 from pytradfri import Gateway, error
 from pytradfri.api.libcoap_api import api_factory

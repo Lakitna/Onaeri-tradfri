@@ -39,7 +39,7 @@ def brightness(val, lightIndex=None):
     """
     if _inRange(val, 0, 255):
         for l in _selectLights(lightIndex):
-            command = l.light_control.set_dimmer(val, transition_time=settings.defaultTransitionTime*10)
+            command = l.light_control.set_dimmer(val, transition_time=settings.Global.transitionTime*10)
             _sendCommand(command)
 
 

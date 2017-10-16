@@ -8,12 +8,16 @@ class Cycle:
     """
     Cycle a group of lamps
     """
-    def __init__(self, group, wakeTime=settings.userAlarmTime, sleepTime=settings.userSleepTime):
+    def __init__(self, group, settingFile=None):
+        if not settingFile is None:
+            self.cycleSettings = settings.get(settingFile)
+
         self.group = group
-        self.lookup = Lookup( wakeTime, sleepTime )
+        self.lookup = Lookup( self.cycleSettings )
         self.observer = Observer( self.group[0] ) # Always observe first lamp in group
 
         self._prevVals = [0,0]
+        print()
 
 
     def tick(self, timeKeeper):
@@ -38,7 +42,7 @@ class Cycle:
         """
         Updates lamps in cycle group to new values.
         """
-        control.color( settings.colorValues[ vals['color'] ], self.group )
+        control.color( settings.Global.colorValues[ vals['color'] ], self.group )
         control.brightness( vals['brightness'], self.group )
 
         # Don't allow the observer to overwrite turning on a lamp

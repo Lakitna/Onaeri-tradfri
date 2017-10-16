@@ -24,7 +24,6 @@ class Observer:
         if not self._legalChange:
             if not self._sameData(newData, self._prev):
                 self.update = True
-                print("[Observer] Illegal change in %d: %s changed to %s" % (self._lampId, key, newData[key]))
 
         # Prep for next iteration
         self._prev = newData
@@ -44,6 +43,7 @@ class Observer:
         """
         for key in new:
             if not prev[key] == new[key] and not key == 'state':
+                print("[Observer] Illegal change in lamp %d: %s changed to %s" % (self._lampId, key, new[key]))
                 return False
         return True
 

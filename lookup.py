@@ -8,41 +8,42 @@ class Lookup:
     """
     Calculates and dispenses lookup tables for light values
     """
-    def __init__(self, wakeTime=settings.userAlarmTime, sleepTime=settings.userSleepTime):
+    def __init__(self, config):
         print("Building lookup table: ", end="", flush=True)
         timeKeeper = TimeKeeper();
+        self.config = config
 
         # Calculate the limits of brightness and color
-        self.briLimit =   self._limitRange(settings.briRange, settings.briCorrect)
-        self.colorLimit = self._limitRange(settings.colorRange, settings.colorCorrect)
+        self.briLimit =   self._limitRange(settings.Global.briRange, self.config.briCorrect)
+        self.colorLimit = self._limitRange(settings.Global.colorRange, self.config.colorCorrect)
 
 
         # Sleep rhythm settings
-        self._userAlarmTime =    timeKeeper.makeCode(settings.userAlarmTime)
-        self._userAlarmOffset =  timeKeeper.makeCode(m=settings.userAlarmOffset)
+        self._userAlarmTime =    timeKeeper.makeCode(self.config.userAlarmTime)
+        self._userAlarmOffset =  timeKeeper.makeCode(m=self.config.userAlarmOffset)
 
-        self._userSleepTime =    timeKeeper.makeCode( settings.userSleepTime )
-        self._userWindDownTime = timeKeeper.makeCode(m=settings.userWindDownTime)
+        self._userSleepTime =    timeKeeper.makeCode(self.config.userSleepTime)
+        self._userWindDownTime = timeKeeper.makeCode(m=self.config.userWindDownTime)
 
 
         # Create morning and evening slopes based on sleep rhythm settings
         self._userMorningSlope = [0,0]
         self._userMorningSlope[0] = self._userAlarmTime - self._userAlarmOffset
-        self._userMorningSlope[1] = self._userMorningSlope[0] + settings.morningSlopeDuration
+        self._userMorningSlope[1] = self._userMorningSlope[0] + self.config.morningSlopeDuration
 
         self._userEveningSlope = [0,0,0,0]
-        self._userEveningSlope[0] = self._userSleepTime - settings.eveningSlopeDuration
+        self._userEveningSlope[0] = self._userSleepTime - self.config.eveningSlopeDuration
         self._userEveningSlope[1] = self._userSleepTime
         self._userEveningSlope[2] = self._userEveningSlope[0]
         if self._userEveningSlope[0] < 0:
             self._userEveningSlope[0] = 0
-            self._userEveningSlope[2] += settings.totalDataPoints
-            self._userEveningSlope[3] = settings.totalDataPoints
+            self._userEveningSlope[2] += self.config.totalDataPoints
+            self._userEveningSlope[3] = self.config.totalDataPoints
 
 
         # Build lookup tables
-        self.brightness = self._buildTable(settings.brightnessData)
-        self.color = self._buildTable(settings.colorData)
+        self.brightness = self._buildTable(settings.Global.brightnessData)
+        self.color = self._buildTable(settings.Global.colorData)
 
         print("Done")
         # print(self.brightness)
@@ -118,12 +119,12 @@ class Lookup:
 
 
         # Resize morningSlope and eveningSlope
-        source['morning'] = resizeSequence( source['morning'], settings.morningSlopeDuration)
-        source['evening'] = resizeSequence( source['evening'], settings.eveningSlopeDuration)
+        source['morning'] = resizeSequence( source['morning'], self.config.morningSlopeDuration)
+        source['evening'] = resizeSequence( source['evening'], self.config.eveningSlopeDuration)
 
 
         # Create table and default to nightflat
-        table = [source['night']] * settings.totalDataPoints
+        table = [source['night']] * settings.Global.totalDataPoints
 
         for timeCode in range(self._userMorningSlope[0], self._userMorningSlope[1]):
             table[timeCode] = source['morning'][timeCode - self._userMorningSlope[0]]

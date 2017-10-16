@@ -8,9 +8,9 @@ class TimeKeeper:
     Handles timekeeping in timecodes
     """
     def __init__(self):
-        self._minPerTimeCode = settings.minPerTimeCode
+        self._minPerTimeCode = settings.Global.minPerTimeCode
         self.timeCode = self.makeCode()
-        self.update = False
+        self.update = True
 
 
     def tick(self):
@@ -37,14 +37,14 @@ class TimeKeeper:
             m = h[1]
             h = h[0]
 
-        self.timeCode = math.floor( ( (h*60) + m + (s/60) ) // settings.minPerTimeCode )
+        self.timeCode = math.floor( ( (h*60) + m + (s/60) ) // self._minPerTimeCode )
         return self.timeCode
 
 
     # def periodToCode(self, h=0, m=0, s=0):
     #     minutes = h*60 + m + s/60
     #
-    #     return round( m // settings.minPerTimeCode )
+    #     return round( m // self._minPerTimeCode )
 
 
     def timeStamp(self, code=None):
@@ -53,7 +53,7 @@ class TimeKeeper:
         """
         if code is None:  code = self.timeCode
 
-        minutes = code * settings.minPerTimeCode
+        minutes = code * self._minPerTimeCode
         h = math.floor(minutes / 60)
         m = math.floor(minutes % 60)
         s = math.floor( (minutes % 1) * 60 )
