@@ -42,7 +42,7 @@ class Observer:
         Compare new to previous observed values. Returns True when both sets are the same.
         """
         for key in new:
-            if not prev[key] == new[key] and not key == 'state':
+            if not prev[key] == new[key] and not (key == 'state' and new[key] == False):
                 print("[Observer] Illegal change in lamp %d: %s changed to %s" % (self._lampId, key, new[key]))
                 return False
         return True
