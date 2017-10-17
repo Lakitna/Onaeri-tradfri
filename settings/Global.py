@@ -13,6 +13,7 @@ colorRange       = (0, 13)      # [min, max] color temp in val
 colorValues = (2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3200, 3400, 3600, 3800, 4000) # In Kelvin
 
 transitionTime = 1              # Lamp transition time in seconds
+commandsTries = 3               # Amount of times to try sending a command
 
 ###############
 # Data tables #

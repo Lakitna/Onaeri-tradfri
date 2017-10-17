@@ -47,7 +47,7 @@ class Cycle:
 
         # Don't allow the observer to overwrite turning on a lamp
         if not self.observer.update and vals['power'] is not None:
-            control.state( vals['power'] )
+            control.state( vals['power'], self.group )
 
         # Prevent observer from overturning legal changes.
         self.observer.legalChange()

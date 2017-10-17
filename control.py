@@ -12,7 +12,7 @@ def state(val, lightIndex=None):
     """
     if val is None:  return
     if val is True or val is False:
-        print("[Control] State change to", val)
+        print("[Control] State change %s to %s" % (lightIndex, val))
         for l in _selectLights(lightIndex, stateChange=True):
             command = l.light_control.set_state(val)
             _sendCommand(command)
@@ -64,7 +64,7 @@ def _sendCommand(command, *, iteration=1):
         com.api(command)
     except error.RequestTimeout:
         print("[Control] Timeout error on try ", iteration)
-        if iteration < settings.sendCommandsTries:
+        if iteration < settings.Global.commandsTries:
             _sendCommand(command, iteration=iteration+1)
 
 

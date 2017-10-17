@@ -2,11 +2,11 @@
 # Time settings #
 #################
 # Alarm time (morning)
-userAlarmTime    = (6, 30)      # Time alarm is set in (hour, minute)
+userAlarmTime    = (9, 0)       # Time alarm is set in (hour, minute)
 userAlarmOffset  = 30           # Wakeup phase offset in minutes
 
 # Bed time (evening)
-userSleepTime    = (22, 0)      # Bedtime in (hour, minute)
+userSleepTime    = (23, 30)     # Bedtime in (hour, minute)
 userWindDownTime = 30           # Wind down time before bed in minutes
 
 
