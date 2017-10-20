@@ -1,5 +1,6 @@
 from com import lights, api
 from pytradfri import error
+import sys
 
 
 class Observer:
@@ -57,7 +58,8 @@ class Observer:
         try:
             api(device.update())
         except error.RequestTimeout:
-            print("[Observer] Timeout error: retrieving data from Gateway failed")
+            sys.stdout.write("\b|")
+            sys.stdout.flush()
             return self._prev
 
         light = device.light_control.lights[0]

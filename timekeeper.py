@@ -8,7 +8,7 @@ class TimeKeeper:
     Handles timekeeping in timecodes
     """
     def __init__(self):
-        self._minPerTimeCode = settings.Global.minPerTimeCode
+        self._minPerTimeCode = settings.app.minPerTimeCode
         self.timeCode = self.makeCode()
         self.update = True
 

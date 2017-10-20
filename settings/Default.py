@@ -18,13 +18,3 @@ colorCorrect     = (0, 100)     # [min, max] color temp in %
 # Cycle anatomy settings
 morningSlopeDuration = 60       # Duration of morningslope in minutes
 eveningSlopeDuration = 500      # Duration of eveningslope in minutes
-
-
-
-
-
-
-# Calculated settings
-from settings import Global
-eveningSlopeDuration = round(eveningSlopeDuration // Global.minPerTimeCode)
-morningSlopeDuration = round(morningSlopeDuration // Global.minPerTimeCode)

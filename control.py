@@ -39,7 +39,7 @@ def brightness(val, lightIndex=None):
     """
     if _inRange(val, 0, 255):
         for l in _selectLights(lightIndex):
-            command = l.light_control.set_dimmer(val, transition_time=settings.Global.transitionTime*10)
+            command = l.light_control.set_dimmer(val, transition_time=settings.app.transitionTime*10)
             _sendCommand(command)
 
 
@@ -64,7 +64,7 @@ def _sendCommand(command, *, iteration=1):
         com.api(command)
     except error.RequestTimeout:
         print("[Control] Timeout error on try ", iteration)
-        if iteration < settings.Global.commandsTries:
+        if iteration < settings.app.commandsTries:
             _sendCommand(command, iteration=iteration+1)
 
 

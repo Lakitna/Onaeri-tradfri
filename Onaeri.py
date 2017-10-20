@@ -23,6 +23,7 @@ print()
 import time
 from timekeeper import TimeKeeper
 from cycle import Cycle
+import settings
 
 
 
@@ -30,46 +31,32 @@ from cycle import Cycle
 ###########
 ## SETUP ##
 ###########
-# Timecode class setup
 timeKeeper = TimeKeeper()
 
 # Setup the cycles
-cycleA = Cycle([1], settingFile="Sander")
-cycleB = Cycle([0], settingFile="Jurrien")
+cycles = []
+for s in settings.app.cycles:
+    cycles.append( Cycle(s["lampIds"], settingFile=s["settingFile"]) )
 
 
 # Start message
 print("Onaeri is now active")
 print()
 
+
 ##########
 ## LOOP ##
 ##########
 while True:
     # Some monitoring stuff
-    print(">", end="", flush=True)
+    print("_", end="", flush=True)
     if timeKeeper.update:  print()
 
-    # Tick cycles
-    cycleA.tick( timeKeeper )
-    cycleB.tick( timeKeeper )
 
-
+    # Tick stuff
+    for cycle in cycles:
+        cycle.tick( timeKeeper )
     timeKeeper.tick()
 
     # Slow down a bit, no stress brah
-    time.sleep(1)
-
-
-    # Temporary api documentation
-    # Print all lights
-    # print(lights)
-
-    # Lights can be accessed by its index, so lights[1] is the second light
-    # light = lights[0]
-
-    # print()
-    # print("Name: ", light.name)
-    # print("State: ", light.light_control.lights[0].state)
-    # print("Dimmer level: ", light.light_control.lights[0].dimmer)
-    # print()
+    time.sleep( settings.app.mainLoopDelay )

@@ -42,7 +42,7 @@ class Cycle:
         """
         Updates lamps in cycle group to new values.
         """
-        control.color( settings.Global.colorValues[ vals['color'] ], self.group )
+        control.color( vals['color'], self.group )
         control.brightness( vals['brightness'], self.group )
 
         # Don't allow the observer to overwrite turning on a lamp

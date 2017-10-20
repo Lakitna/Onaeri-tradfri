@@ -14,8 +14,8 @@ class Lookup:
         self.config = config
 
         # Calculate the limits of brightness and color
-        self.briLimit =   self._limitRange(settings.Global.briRange, self.config.briCorrect)
-        self.colorLimit = self._limitRange(settings.Global.colorRange, self.config.colorCorrect)
+        self.briLimit =   self._limitRange(settings.app.briRange, self.config.briCorrect)
+        self.colorLimit = self._limitRange(settings.app.colorRange, self.config.colorCorrect)
 
 
         # Sleep rhythm settings
@@ -42,8 +42,8 @@ class Lookup:
 
 
         # Build lookup tables
-        self.brightness = self._buildTable(settings.Global.brightnessData)
-        self.color = self._buildTable(settings.Global.colorData)
+        self.brightness = self._buildTable(settings.app.brightnessData)
+        self.color = self._buildTable(settings.app.colorData)
 
         print("Done")
         # print(self.brightness)
@@ -124,7 +124,7 @@ class Lookup:
 
 
         # Create table and default to nightflat
-        table = [source['night']] * settings.Global.totalDataPoints
+        table = [source['night']] * settings.app.totalDataPoints
 
         for timeCode in range(self._userMorningSlope[0], self._userMorningSlope[1]):
             table[timeCode] = source['morning'][timeCode - self._userMorningSlope[0]]

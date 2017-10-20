@@ -1,4 +1,4 @@
-import settings.Global as settings
+import settings
 
 print("Getting network data from gateway: ", end="", flush=True)
 
@@ -8,7 +8,7 @@ from pytradfri.api.libcoap_api import api_factory
 
 # Setup communication with the gateway
 try:
-    api = api_factory(settings.gatewayIp, settings.gatewayKey)
+    api = api_factory(settings.app.gatewayIp, settings.app.gatewayKey)
 except error.RequestTimeout:
     print("Couldn't reach gateway. Please check the settings in settings.py and try again.")
     print("Exiting Onaeri")
