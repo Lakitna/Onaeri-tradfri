@@ -7,7 +7,8 @@ gatewayKey = "LDJSVW4UPCH6aORG" # The connection code on the back of the gateway
 
 cycles = [
     {"settingFile": "Sander", "lampIds": [1,2]},
-    {"settingFile": "Jurrien", "lampIds": [0]}
+    {"settingFile": "Jurrien", "lampIds": [0]},
+    {"settingFile": "Hallway", "lampIds": [3]}
 ]
 
 

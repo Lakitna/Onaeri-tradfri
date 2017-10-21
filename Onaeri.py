@@ -40,6 +40,7 @@ for s in settings.app.cycles:
 
 
 # Start message
+print()
 print("Onaeri is now active")
 print()
 

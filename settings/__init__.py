@@ -3,7 +3,7 @@ import importlib
 from settings import app
 
 
-def get(settingFile):
+def get(settingFile=""):
     """
     Return correct setting file
     """
@@ -11,19 +11,18 @@ def get(settingFile):
     files = _settingFileList()
     if not settingFile in files:
         settingFile = "Default"
-    settings = importlib.import_module(__name__+"."+settingFile, package=None)
+    userSettings = importlib.import_module(__name__+"."+settingFile, package=None)
 
 
     # Some calculations on settings
-    settings.eveningSlopeDuration = round(settings.eveningSlopeDuration // app.minPerTimeCode)
-    settings.morningSlopeDuration = round(settings.morningSlopeDuration // app.minPerTimeCode)
+    userSettings.eveningSlopeDuration = round(userSettings.eveningSlopeDuration // app.minPerTimeCode)
+    userSettings.morningSlopeDuration = round(userSettings.morningSlopeDuration // app.minPerTimeCode)
 
 
     # Make sure all settings are within expectations
-    integrityValidation(settings)
+    integrityValidation(userSettings)
 
-    return settings
-
+    return userSettings
 
 
 def _settingFileList():
@@ -38,40 +37,29 @@ def _settingFileList():
 
 
 
-def integrityValidation(settings):
-    # Check integrity of settings
-    print("Validating global settings: ", end='', flush=True)
-    _checkIntegrity(app.minPerTimeCode, check="unsigned")
-    _checkIntegrity(app.brightnessData['morning'], 0, 100)
-    _checkIntegrity(app.brightnessData['evening'], 0, 100)
-    _checkIntegrity(app.brightnessData['day'], 0, 100)
-    _checkIntegrity(app.brightnessData['night'], 0, 100)
-    _checkIntegrity(app.colorData['morning'], 0, 100)
-    _checkIntegrity(app.colorData['evening'], 0, 100)
-    _checkIntegrity(app.colorData['day'], 0, 100)
-    _checkIntegrity(app.colorData['night'], 0, 100)
-    _checkIntegrity(app.transitionTime, check="unsigned")
-    _checkIntegrity(app.briRange, 1, 254)
-    _checkIntegrity(app.colorRange, 2200, 4000)
-    _checkIntegrity(app.totalDataPoints, check="unsigned")
+def integrityValidation(userSettings):
+    """
+    Check integrity of settings
+    """
+    cycleName = userSettings.__name__.split(".")[1]
+    print("Validating user settings for %s: " % cycleName, end='', flush=True)
+    _checkIntegrity(userSettings.userAlarmTime, check="time")
+    _checkIntegrity(userSettings.userAlarmOffset, check="unsigned")
+    _checkIntegrity(userSettings.userSleepTime, check="time")
+    _checkIntegrity(userSettings.userWindDownTime, check="unsigned")
+    _checkIntegrity(userSettings.briCorrect, 0, 100)
+    _checkIntegrity(userSettings.colorCorrect, 0, 100)
+    _checkIntegrity(userSettings.morningSlopeDuration, check="unsigned")
+    _checkIntegrity(userSettings.eveningSlopeDuration, check="unsigned")
     print("Done")
-    print("Validating user settings: ", end='', flush=True)
-    _checkIntegrity(settings.briCorrect, 0, 100)
-    _checkIntegrity(settings.colorCorrect, 0, 100)
-    _checkIntegrity(settings.userAlarmTime, check="time")
-    _checkIntegrity(settings.userAlarmOffset, check="unsigned")
-    _checkIntegrity(settings.userSleepTime, check="time")
-    _checkIntegrity(settings.userWindDownTime, check="unsigned")
-    _checkIntegrity(settings.morningSlopeDuration, check="unsigned")
-    _checkIntegrity(settings.eveningSlopeDuration, check="unsigned")
-    print("Done")
-
 
 
 
 
 def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
-    'Check value range and exit() on problems.'
+    """
+    Check value range and exit() on problems.
+    """
     def _ruling(x, mi, ma):
         if not mi <= x <= ma:
             # If not within range:
@@ -91,7 +79,7 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
 
     elif check is "unsigned":
         # If requiring a unsigned value:
-        if not val > 0:
+        if not val >= 0:
             print("[Settings] Invalid input '%s' for allowed range 0-infinite." % (val))
             exit()
 
@@ -99,3 +87,22 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
         # If checking a timestamp:
         _ruling(val[0], 0, 23)
         _ruling(val[1], 0, 59)
+
+
+
+
+print("Validating global settings: ", end='', flush=True)
+_checkIntegrity(app.minPerTimeCode, check="unsigned")
+_checkIntegrity(app.brightnessData['morning'], 0, 100)
+_checkIntegrity(app.brightnessData['evening'], 0, 100)
+_checkIntegrity(app.brightnessData['day'], 0, 100)
+_checkIntegrity(app.brightnessData['night'], 0, 100)
+_checkIntegrity(app.colorData['morning'], 0, 100)
+_checkIntegrity(app.colorData['evening'], 0, 100)
+_checkIntegrity(app.colorData['day'], 0, 100)
+_checkIntegrity(app.colorData['night'], 0, 100)
+_checkIntegrity(app.transitionTime, check="unsigned")
+_checkIntegrity(app.briRange, 1, 254)
+_checkIntegrity(app.colorRange, 2200, 4000)
+_checkIntegrity(app.totalDataPoints, check="unsigned")
+print("Done")

@@ -9,7 +9,9 @@ class Lookup:
     Calculates and dispenses lookup tables for light values
     """
     def __init__(self, config):
-        print("Building lookup table: ", end="", flush=True)
+        cycleName = config.__name__.split(".")[1]
+        print("Building lookup table for %s: " % cycleName, end="", flush=True)
+
         timeKeeper = TimeKeeper();
         self.config = config
 
@@ -105,7 +107,7 @@ class Lookup:
 
         def resizeSequence(source, length):
             """
-            Resize a data sequence. Shrinking is here more effective than expanding.
+            Crude way of resizing a data sequence. Shrinking is here more accurate than expanding.
             """
             sourceLen = len(source)
             out = []

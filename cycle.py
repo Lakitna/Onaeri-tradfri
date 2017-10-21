@@ -8,16 +8,14 @@ class Cycle:
     """
     Cycle a group of lamps
     """
-    def __init__(self, group, settingFile=None):
-        if not settingFile is None:
-            self.cycleSettings = settings.get(settingFile)
-
+    def __init__(self, group, settingFile):
+        print()
+        self.cycleSettings = settings.get(settingFile)
         self.group = group
         self.lookup = Lookup( self.cycleSettings )
         self.observer = Observer( self.group[0] ) # Always observe first lamp in group
 
         self._prevVals = [0,0]
-        print()
 
 
     def tick(self, timeKeeper):
@@ -47,7 +45,8 @@ class Cycle:
 
         # Don't allow the observer to overwrite turning on a lamp
         if not self.observer.update and vals['power'] is not None:
-            control.state( vals['power'], self.group )
+            if self.cycleSettings.automaticStateChange:
+                control.state( vals['power'], self.group )
 
         # Prevent observer from overturning legal changes.
         self.observer.legalChange()
