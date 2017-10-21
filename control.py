@@ -16,7 +16,7 @@ def state(val, lightIndex=None):
         for l in _selectLights(lightIndex, stateChange=True):
             command = l.light_control.set_state(val)
             _sendCommand(command)
-            return
+        return
 
     else:
         print("[Control] Input value error. Allowed values 'True', 'False' or 'None'.")
@@ -31,6 +31,7 @@ def color(val, lightIndex=None):
         for l in _selectLights(lightIndex):
             command = l.light_control.set_kelvin_color(val)
             _sendCommand(command)
+        return
 
 
 def brightness(val, lightIndex=None):
@@ -41,6 +42,7 @@ def brightness(val, lightIndex=None):
         for l in _selectLights(lightIndex):
             command = l.light_control.set_dimmer(val, transition_time=settings.app.transitionTime*10)
             _sendCommand(command)
+        return
 
 
 
@@ -63,7 +65,7 @@ def _sendCommand(command, *, iteration=1):
     try:
         com.api(command)
     except error.RequestTimeout:
-        print("[Control] Timeout error on try ", iteration)
+        print("[Control] Timeout error on try", iteration)
         if iteration < settings.app.commandsTries:
             _sendCommand(command, iteration=iteration+1)
 
