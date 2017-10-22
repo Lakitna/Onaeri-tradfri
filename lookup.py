@@ -15,11 +15,6 @@ class Lookup:
         timeKeeper = TimeKeeper();
         self.config = config
 
-        # Calculate the limits of brightness and color
-        self.briLimit =   self._limitRange(settings.app.briRange, self.config.briCorrect)
-        self.colorLimit = self._limitRange(settings.app.colorRange, self.config.colorCorrect)
-
-
         # Sleep rhythm settings
         self._userAlarmTime =    timeKeeper.makeCode(self.config.userAlarmTime)
         self._userAlarmOffset =  timeKeeper.makeCode(m=self.config.userAlarmOffset)
@@ -44,8 +39,8 @@ class Lookup:
 
 
         # Build lookup tables
-        self.brightness = self._buildTable(settings.app.brightnessData)
-        self.color = self._buildTable(settings.app.colorData)
+        self.brightness = self._buildTable(settings.app.brightnessData, self.config.briCorrect)
+        self.color = self._buildTable(settings.app.colorData, self.config.colorCorrect)
 
         print("Done")
         # print(self.brightness)
@@ -60,13 +55,13 @@ class Lookup:
         """
         brightness = round(
                 (self.brightness[timeCode] / 100)
-                * (self.briLimit[1] - self.briLimit[0])
-                + self.briLimit[0]
+                * (settings.app.briRange[1] - settings.app.briRange[0])
+                + settings.app.briRange[0]
             )
         color = round(
                 (self.color[timeCode] / 100)
-                * (self.colorLimit[1] - self.colorLimit[0])
-                + self.colorLimit[0]
+                * (settings.app.colorRange[1] - settings.app.colorRange[0])
+                + settings.app.colorRange[0]
             )
 
         if timeCode == (self._userAlarmTime - self._userAlarmOffset):
@@ -80,27 +75,7 @@ class Lookup:
 
 
 
-    def _limitRange(self, absoluteRange, correction):
-        """
-        Limit an absolute range based on a percentage correction tuple
-        """
-        rangeDifference = absoluteRange[1] - absoluteRange[0]
-        out = [0,0]
-        out[0] = round(
-                (correction[0] / 100)
-                * rangeDifference
-                + absoluteRange[0]
-            )
-        out[1] = round(
-                (correction[1] / 100)
-                * rangeDifference
-                + absoluteRange[0]
-            )
-        return out
-
-
-
-    def _buildTable(self, source):
+    def _buildTable(self, source, sourceRange):
         """
         Build a lookup table based on class attributes and a given data source.
         """
@@ -119,6 +94,21 @@ class Lookup:
                 out.append(source[key])
             return out
 
+        def applySourceRange(val):
+            """
+            Apply sourceRange to input.
+            """
+            ret = round(
+                    val
+                    * ((sourceRange[1] - sourceRange[0]) / 10)
+                    + sourceRange[0]
+                ) / 10
+
+            if (ret % 1) == 0:
+                ret = round(ret)
+
+            return ret
+
 
         # Resize morningSlope and eveningSlope
         source['morning'] = resizeSequence( source['morning'], self.config.morningSlopeDuration)
@@ -126,24 +116,30 @@ class Lookup:
 
 
         # Create table and default to nightflat
-        table = [source['night']] * settings.app.totalDataPoints
+        table = [source['night']+sourceRange[0]] * settings.app.totalDataPoints
 
         for timeCode in range(self._userMorningSlope[0], self._userMorningSlope[1]):
-            table[timeCode] = source['morning'][timeCode - self._userMorningSlope[0]]
+            table[timeCode] = applySourceRange(
+                                    source['morning'][timeCode - self._userMorningSlope[0]]
+                                )
             # print("morning %s > %s" % (timeCode, table[timeCode]))
 
 
         for timeCode in range(self._userEveningSlope[0], self._userEveningSlope[1]):
-            table[timeCode] = source['evening'][timeCode - self._userEveningSlope[0]]
+            table[timeCode] = applySourceRange(
+                                    source['evening'][timeCode - self._userEveningSlope[0]]
+                                )
             # print("evening %s > %s" % (timeCode, table[timeCode]))
 
         for timeCode in range(self._userEveningSlope[2], self._userEveningSlope[3]):
-            table[timeCode] = source['evening'][timeCode - self._userEveningSlope[2]]
+            table[timeCode] = applySourceRange(
+                                    source['evening'][timeCode - self._userEveningSlope[2]]
+                                )
             # print("evening %s > %s" % (timeCode, table[timeCode]))
 
 
         for timeCode in range(self._userMorningSlope[1], self._userEveningSlope[2]):
-            table[timeCode] = source['day']
+            table[timeCode] = applySourceRange( source['day'] )
             # print("day %s > %s" % (timeCode, table[timeCode]))
 
 

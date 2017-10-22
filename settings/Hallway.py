@@ -1,5 +1,5 @@
 # Alarm time (morning)
-userAlarmTime    = (8, 0)       # Time alarm is set in (hour, minute)
+userAlarmTime    = (6, 0)       # Time alarm is set in (hour, minute)
 userAlarmOffset  = 0            # Wakeup phase offset in minutes
 
 # Bed time (evening)
@@ -13,7 +13,7 @@ colorCorrect     = (0, 0)       # [min, max] color temp in %
 
 
 # Cycle anatomy settings
-morningSlopeDuration = 60       # Duration of morningslope in minutes
+morningSlopeDuration = 180      # Duration of morningslope in minutes
 eveningSlopeDuration = 400      # Duration of eveningslope in minutes
 
 

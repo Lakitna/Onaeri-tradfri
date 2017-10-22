@@ -23,28 +23,26 @@ class TimeKeeper:
             self.update = True
 
 
-    def makeCode(self, h=0, m=0, s=0):
+    def makeCode(self, h=None, m=None, s=None):
         """
         Calculate a new timecode
         """
-        if h == 0 and m == 0 and s == 0:
+        if h == None and m == None and s == None:
             h = time.localtime().tm_hour
             m = time.localtime().tm_min
             s = time.localtime().tm_sec
+
         if type(h) is tuple:
-            if len(h) > 2:
-                s = h[2]
-            m = h[1]
+            if len(h) > 2:  s = h[2]
+            if len(h) > 1:  m = h[1]
             h = h[0]
+
+        if h == None:  h=0
+        if m == None:  m=0
+        if s == None:  s=0
 
         self.timeCode = math.floor( ( (h*60) + m + (s/60) ) // self._minPerTimeCode )
         return self.timeCode
-
-
-    # def periodToCode(self, h=0, m=0, s=0):
-    #     minutes = h*60 + m + s/60
-    #
-    #     return round( m // self._minPerTimeCode )
 
 
     def timeStamp(self, code=None):
