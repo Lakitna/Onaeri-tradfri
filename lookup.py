@@ -44,9 +44,9 @@ class Lookup:
         self.color = self._buildTable(settings.app.colorData, self.config.colorCorrect)
 
         print("Done")
-        print(self.brightness)
-        print()
-        print(self.color)
+        # print(self.brightness)
+        # print()
+        # print(self.color)
         # exit()
 
 
