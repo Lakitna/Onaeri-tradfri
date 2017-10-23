@@ -28,10 +28,13 @@ def color(val, lightIndex=None):
     """
     Update the color of one or more lamps.
     """
-    if helper.inRange(val, (2200, 4000)):
+    if helper.inRange(val, settings.app.colorRange):
         for l in _selectLights(lightIndex):
             command = l.light_control.set_kelvin_color(val)
             _sendCommand(command)
+        return
+    else:
+        print("[Control] Color input value error. Allowed range %s, %d given." % (settings.app.colorRange, val))
         return
 
 
@@ -39,16 +42,19 @@ def brightness(val, lightIndex=None):
     """
     Update the brightness of one or more lamps.
     """
-    if helper.inRange(val, (0, 255)):
+    if helper.inRange(val, settings.app.briRange):
         for l in _selectLights(lightIndex):
             command = l.light_control.set_dimmer(val, transition_time=settings.app.transitionTime*10)
             _sendCommand(command)
+        return
+    else:
+        print("[Control] Brightness input value error. Allowed range %s, %d given." % (settings.app.briRange, val))
         return
 
 
 
 
-def _sendCommand(command, *, iteration=1):
+def _sendCommand(command, iteration=1):
     """
     Send command with retry on timeout
     """

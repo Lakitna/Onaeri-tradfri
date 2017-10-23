@@ -9,8 +9,10 @@ def scale(val, inRange, outRange, decimals=1):
 
     if ret % 1 == 0:
         ret = round(ret)
-    else:
+    elif decimals > 0:
         ret = round(ret * (10*decimals)) / (10*decimals)
+    else:
+        ret = round(ret)
 
     return ret
 
@@ -36,6 +38,4 @@ def inRange(val, rnge):
     """
     if rnge[0] <= val <= rnge[1]:
         return True
-
-    print("[Control] Input value error. Allowed range %s, %d given." % (rnge, val))
     return False

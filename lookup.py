@@ -54,8 +54,8 @@ class Lookup:
         """
         Get the values associated with timecode
         """
-        brightness = helper.scale(self.brightness[timeCode], (0,100), settings.app.briRange)
-        color      = helper.scale(self.color[timeCode], (0,100), settings.app.colorRange)
+        brightness = helper.scale(self.brightness[timeCode], (0,100), settings.app.briRange, decimals=0)
+        color      = helper.scale(self.color[timeCode], (0,100), settings.app.colorRange, decimals=0)
 
 
         if timeCode == (self._userAlarmTime - self._userAlarmOffset):
