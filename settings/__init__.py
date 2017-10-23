@@ -1,13 +1,13 @@
 import os
 import importlib
 from settings import app
+import helper
 
 
 def get(settingFile=""):
     """
     Return correct setting file
     """
-
     files = _settingFileList()
     if not settingFile in files:
         settingFile = "Default"
@@ -60,33 +60,32 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
     """
     Check value range and exit() on problems.
     """
-    def _ruling(x, mi, ma):
-        if not mi <= x <= ma:
-            # If not within range:
-            print("[Settings] Invalid input '%s' for allowed range %d-%d." % (x, mi, ma))
+    def _ruling(v, rnge):
+        if not helper.inRange(v, rnge):
+            print("[Settings] Invalid input '%s' for allowed range %s." % (v, rnge))
             exit()
 
 
     if check is None:
-        # If no special check:
         if type(val) is dict or type(val) is list or type(val) is tuple:
             # If checking an iterable var:
             for v in val:
-                _ruling(v, rmin, rmax)
+                _ruling(v, (rmin, rmax))
         else:
-            # If not iterable:
-            _ruling(val, rmin, rmax)
+            _ruling(val, (rmin, rmax))
 
     elif check is "unsigned":
-        # If requiring a unsigned value:
         if not val >= 0:
             print("[Settings] Invalid input '%s' for allowed range 0-infinite." % (val))
             exit()
 
     elif check is "time":
-        # If checking a timestamp:
-        _ruling(val[0], 0, 23)
-        _ruling(val[1], 0, 59)
+        _ruling(val[0], (0, 23))
+        _ruling(val[1], (0, 59))
+
+    else:
+        print("[Settings] Check `%s` could not be performed." % check)
+        exit()
 
 
 

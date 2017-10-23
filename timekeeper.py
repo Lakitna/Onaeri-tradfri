@@ -32,14 +32,14 @@ class TimeKeeper:
             m = time.localtime().tm_min
             s = time.localtime().tm_sec
 
+        if h == None:  h=0
+        if m == None:  m=0
+        if s == None:  s=0
+
         if type(h) is tuple:
             if len(h) > 2:  s = h[2]
             if len(h) > 1:  m = h[1]
             h = h[0]
-
-        if h == None:  h=0
-        if m == None:  m=0
-        if s == None:  s=0
 
         self.timeCode = math.floor( ( (h*60) + m + (s/60) ) // self._minPerTimeCode )
         return self.timeCode
@@ -47,7 +47,7 @@ class TimeKeeper:
 
     def timeStamp(self, code=None):
         """
-        Return the timestring linked to a timecode
+        Return the timestring of a timecode
         """
         if code is None:  code = self.timeCode
 

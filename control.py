@@ -4,6 +4,7 @@ import time
 from pytradfri import error
 import com
 import settings
+import helper
 
 
 def state(val, lightIndex=None):
@@ -27,7 +28,7 @@ def color(val, lightIndex=None):
     """
     Update the color of one or more lamps.
     """
-    if _inRange(val, 2200, 4000):
+    if helper.inRange(val, (2200, 4000)):
         for l in _selectLights(lightIndex):
             command = l.light_control.set_kelvin_color(val)
             _sendCommand(command)
@@ -38,24 +39,13 @@ def brightness(val, lightIndex=None):
     """
     Update the brightness of one or more lamps.
     """
-    if _inRange(val, 0, 255):
+    if helper.inRange(val, (0, 255)):
         for l in _selectLights(lightIndex):
             command = l.light_control.set_dimmer(val, transition_time=settings.app.transitionTime*10)
             _sendCommand(command)
         return
 
 
-
-
-def _inRange(input, mi, ma):
-    """
-    Validate input value
-    """
-    if input in range(mi, ma+1):
-        return True
-
-    print("[Control] Input value error. Allowed range %d-%d, %d given." % (mi, ma, input))
-    return False
 
 
 def _sendCommand(command, *, iteration=1):

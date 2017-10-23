@@ -57,6 +57,7 @@ while True:
     # Tick stuff
     for cycle in cycles:
         cycle.tick( timeKeeper )
+
     timeKeeper.tick()
 
     # Slow down a bit, no stress brah
