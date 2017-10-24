@@ -2,29 +2,28 @@
 """
 Awesome Tradfri controller for circadian rhythm improvement
 
+Source:
+https://github.com/Lakitna/Onaeri-tradfri
+
+To run execute command:
 $ python3 Onaeri.py
 """
 
 
-__version__ = '0.1'
+__version__ = '0.2'
 __author__ = 'Sander van Beek'
 
 
 # Clear terminal
 print("\n" * 100)
+print("Onaeri Tradfri v%s" % __version__)
+print()
 
 
-# Standard modules
 import time
-
-# Custom modules
+from timekeeper import TimeKeeper
+from cycle import Cycle
 import settings
-import com
-import control
-from timecode import TimeCode
-from lookup import Lookup
-from observer import Observer
-
 
 
 
@@ -32,70 +31,34 @@ from observer import Observer
 ###########
 ## SETUP ##
 ###########
-# Lookup class setup
-data = Lookup()
+timeKeeper = TimeKeeper()
 
-# Timecode class setup
-tc = TimeCode(minPerTimeCode=settings.minPerTimeCode)
+# Setup the cycles
+cycles = []
+for s in settings.app.cycles:
+    cycles.append( Cycle(s["lampIds"], settingFile=s["settingFile"]) )
 
-# Observer class setup for lamp 0
-obs = Observer(0)
-
-# Make list to keep track of value changes
-prevVals = [999,999]
 
 # Start message
+print()
 print("Onaeri is now active")
 print()
+
 
 ##########
 ## LOOP ##
 ##########
 while True:
-    obs.do()
-
-    # Print all lights
-    # print(lights)
-
-    # Lights can be accessed by its index, so lights[1] is the second light
-    # light = lights[0]
-
-    # print()
-    # print("Name: ", light.name)
-    # print("State: ", light.light_control.lights[0].state)
-    # print("Dimmer level: ", light.light_control.lights[0].dimmer)
-    # print()
-
-    timeCodeUpdate = tc.update()
-
-    # If new timecode or observer dictates update
-    if timeCodeUpdate or obs.update:
-        # Get new data from Lookup class
-        vals = data.get( tc.get() )
-
-        # If the vals have changed or observer dictates update
-        if not vals == prevVals or obs.update:
-            print("[%s] Setting lamp to {bri: %d, color: %d}" % (tc.decode(), vals[0], vals[1]))
-            # Change color
-            control.color(settings.colorValues[ vals[1] ] )
-            # Change brightness
-            control.brightness( vals[0] )
-
-            # Prevent observer from overturning legal changes.
-            obs.notifyLegalChange()
+    # Some monitoring stuff
+    print("_", end="", flush=True)
+    if timeKeeper.update:  print()
 
 
-        # Only set lamp state on timecode update flag to enable manually
-        # turning the lamps back on after auto-change.
-        if timeCodeUpdate:
-            if data.setState( tc.get() ):
-                # Prevent observer from overturning legal changes.
-                obs.notifyLegalChange()
+    # Tick stuff
+    for cycle in cycles:
+        cycle.tick( timeKeeper )
 
-
-        # Prep for next loop
-        prevVals = vals
-
+    timeKeeper.tick()
 
     # Slow down a bit, no stress brah
-    time.sleep(1)
+    time.sleep( settings.app.mainLoopDelay )
