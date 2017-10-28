@@ -24,3 +24,5 @@ At this point, this controller requires the user to know the basics of running P
    - Set your bed- and waketime (`userAlarmTime` and `userSleepTime`)
 4. Run Onaeri.py and observe the awesomeness
 
+## Contributing
+Feel free to contribute, adapt & repurpose for any purpose, including commercial use. Just make sure you adhere to basic Github conventions :)
