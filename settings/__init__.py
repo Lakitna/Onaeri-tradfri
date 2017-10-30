@@ -3,7 +3,7 @@ import importlib
 from settings import Global
 import helper
 
-blacklist = ["Global", "Example", "__init__"]
+blacklist = ["Global", "Template", "__init__"]
 
 def _settingFileList():
     """
