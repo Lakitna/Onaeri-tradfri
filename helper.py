@@ -1,5 +1,7 @@
 def printError(string):
     print("\033[1;31m%s\033[0;0m" % string)
+def printWarning(string):
+    print("\033[1;34m%s\033[0;0m" % string)
 def printDone():
     print("\033[0;32m%s\033[0;0m" % "Done")
 

@@ -11,8 +11,7 @@ from pytradfri.api.libcoap_api import api_factory
 try:
     api = api_factory(settings.Global.gatewayIp, settings.Global.gatewayKey)
 except error.RequestTimeout:
-    helper.printError("Couldn't reach gateway. Please check the settings in settings.py and try again.")
-    helper.printError("Exiting Onaeri")
+    helper.printError("\nCouldn't reach gateway. Please check the settings in settings/Global.py and try again. \nExiting Onaeri.")
     exit()
 
 
