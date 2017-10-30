@@ -22,7 +22,7 @@ gateway = Gateway()
 # Get lamp network state and devices. Prep them for use
 devices_command = gateway.get_devices()
 devices_commands = api(devices_command)
-devices = api(*devices_commands)
+devices = api(devices_commands)
 
 helper.printDone()
 

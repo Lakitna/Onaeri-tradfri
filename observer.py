@@ -64,4 +64,4 @@ class Observer:
             return self._prev
 
         light = device.light_control.lights[0]
-        return {'state': light.state, 'bright': light.dimmer, 'color': light.kelvin_color}
+        return {'state': light.state, 'bright': light.dimmer, 'color': light.kelvin_color_inferred}
