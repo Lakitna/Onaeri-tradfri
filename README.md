@@ -32,10 +32,10 @@ Download all the files in this repository and place it in a convenient location.
 ### 3. Change settings
 Change the settings in the `settings` folder
 
-    1. In `Global.py` add the details to your gateway (`gatewayIp` and `gatewayKey`)
-    2. Create a cycle by making a new settings file using `Template.py` as a template. For example name it `Bedroom.py`.
-    3. Change your bedtime (`userAlarmTime`) and waketime (`userSleepTime`) in the new `Bedroom.py` settings file.
-    4. Using the official Ikea Trådfri app change the names of your lamps to include the name of the settings file you made in the previous steps. In our example you could name one light `Bedroom ceiling` and another lamp could be `bedroom nightstand`.
+1. In `Global.py` add the details to your gateway (`gatewayIp` and `gatewayKey`)
+2. Create a cycle by making a new settings file using `Template.py` as a template. For example name it `Bedroom.py`.
+3. Change your bedtime (`userAlarmTime`) and waketime (`userSleepTime`) in the new `Bedroom.py` settings file.
+4. Using the official Ikea Trådfri app change the names of your lamps to include the name of the settings file you made in the previous steps. In our example you could name one light `Bedroom ceiling` and another lamp could be `bedroom nightstand`.
 
 ### 4. Run it
 Run Onaeri.py using the following command, but don't forget to `cd` to the correct folder first:
