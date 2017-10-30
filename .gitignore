@@ -1,3 +1,8 @@
+# Setting files
+settings/Sander.py
+settings/Jurrien.py
+settings/Hallway.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

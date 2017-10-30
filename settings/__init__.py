@@ -20,7 +20,8 @@ def _settingFileList():
 
 cycles = _settingFileList();
 if len(cycles) == 0:
-    print("No setting files found. Please create a file in the `settings` folder.")
+    helper.printError("No setting files found. Please create a file in the `settings` folder using the template.")
+    exit()
 
 
 
@@ -30,7 +31,9 @@ def get(settingFile=""):
     Return correct setting file
     """
     if not settingFile in cycles:
-        settingFile = "Default"
+        helper.printError("Setting file %s not found" % settingFile)
+        exit()
+        
     userSettings = importlib.import_module(__name__+"."+settingFile, package=None)
 
 
