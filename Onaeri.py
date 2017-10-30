@@ -35,8 +35,8 @@ timeKeeper = TimeKeeper()
 
 # Setup the cycles
 cycles = []
-for s in settings.app.cycles:
-    cycles.append( Cycle(settingFile=s["settingFile"]) )
+for cycleName in settings.cycles:
+    cycles.append( Cycle(cycleName) )
 
 
 # Start message
@@ -61,4 +61,4 @@ while True:
     timeKeeper.tick()
 
     # Slow down a bit, no stress brah
-    time.sleep( settings.app.mainLoopDelay )
+    time.sleep( settings.Global.mainLoopDelay )

@@ -1,4 +1,5 @@
 import settings
+import helper
 
 print("Getting network data from gateway: ", end="", flush=True)
 
@@ -8,10 +9,10 @@ from pytradfri.api.libcoap_api import api_factory
 
 # Setup communication with the gateway
 try:
-    api = api_factory(settings.app.gatewayIp, settings.app.gatewayKey)
+    api = api_factory(settings.Global.gatewayIp, settings.Global.gatewayKey)
 except error.RequestTimeout:
-    print("Couldn't reach gateway. Please check the settings in settings.py and try again.")
-    print("Exiting Onaeri")
+    helper.printError("Couldn't reach gateway. Please check the settings in settings.py and try again.")
+    helper.printError("Exiting Onaeri")
     exit()
 
 
@@ -23,7 +24,7 @@ devices_command = gateway.get_devices()
 devices_commands = api(devices_command)
 devices = api(*devices_commands)
 
-print("Done")
+helper.printDone()
 
 
 # Get list of all controllable lamps

@@ -40,10 +40,10 @@ class Lookup:
 
 
         # Build lookup tables
-        self.brightness = self._buildTable(settings.app.brightnessData, self.config.briCorrect)
-        self.color = self._buildTable(settings.app.colorData, self.config.colorCorrect)
+        self.brightness = self._buildTable(settings.Global.brightnessData, self.config.briCorrect)
+        self.color = self._buildTable(settings.Global.colorData, self.config.colorCorrect)
 
-        print("Done")
+        helper.printDone()
         # print(self.brightness)
         # print()
         # print(self.color)
@@ -54,8 +54,8 @@ class Lookup:
         """
         Get the values associated with timecode
         """
-        brightness = helper.scale(self.brightness[timeCode], (0,100), settings.app.briRange, decimals=0)
-        color      = helper.scale(self.color[timeCode], (0,100), settings.app.colorRange, decimals=0)
+        brightness = helper.scale(self.brightness[timeCode], (0,100), settings.Global.briRange, decimals=0)
+        color      = helper.scale(self.color[timeCode], (0,100), settings.Global.colorRange, decimals=0)
 
 
         if timeCode == (self._userAlarmTime - self._userAlarmOffset):
@@ -79,7 +79,7 @@ class Lookup:
 
 
         # Create full table and default to nightflat
-        table = [source['night']+sourceRange[0]] * settings.app.totalDataPoints
+        table = [source['night']+sourceRange[0]] * settings.Global.totalDataPoints
 
         for timeCode in range(self._userMorningSlope[0], self._userMorningSlope[1]):
             table[timeCode] = source['morning'][timeCode - self._userMorningSlope[0]]

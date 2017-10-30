@@ -3,16 +3,18 @@ import control
 from lookup import Lookup
 from observer import Observer
 import com
+import helper
 
 
 class Cycle:
     """
     Cycle a group of lamps
     """
-    def __init__(self, settingFile):
+    def __init__(self, name):
         print()
-        self.cycleSettings = settings.get(settingFile)
-        self.group = self._lampNameToIds( settingFile )
+        self.name = name
+        self.cycleSettings = settings.get( self.name )
+        self.group = self._lampNameToIds( self.name )
         self.lookup = Lookup( self.cycleSettings )
         self.observer = Observer( self.group[0] ) # Always observe first lamp in group
 
@@ -31,7 +33,7 @@ class Cycle:
             # If the vals have changed or observer dictates update
             if (not newVals == self._prevVals) or self.observer.update:
                 self._update(newVals)
-                print("[%s] Setting lamp %s to {bri: %d, color: %d}" % (timeKeeper.timeStamp(), self.group, newVals['brightness'], newVals['color']))
+                print("[%s] Setting cycle %s %s to {bri: %d, color: %d}" % (timeKeeper.timeStamp(), self.name, self.group, newVals['brightness'], newVals['color']))
 
             # Prep for next loop
             self._prevVals = newVals
@@ -54,6 +56,9 @@ class Cycle:
 
 
     def _lampNameToIds(self, name):
+        """
+        Get lamp ids (plural) based on a partial device name.
+        """
         ret = []
         for i in range(len(com.lights)):
             if name.lower() in com.lights[i].name.lower():
@@ -61,5 +66,5 @@ class Cycle:
 
         if len(ret) == 0:
             ret = [0] # Default to lamp 0
-            print("[Cycle] Lamp with partial name `%s` not found" % name)
+            helper.printError("[Cycle] No lamps found with partial name `%s`. Use the Ikea Tradfri app to change the name of a lamp." % name)
         return ret

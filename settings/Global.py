@@ -5,13 +5,6 @@ gatewayIp  = "192.168.178.48"   # The local IP address of your gateway
 gatewayKey = "LDJSVW4UPCH6aORG" # The connection code on the back of the gateway
 
 
-cycles = [
-    {"settingFile": "Sander"},
-    {"settingFile": "Jurrien"},
-    {"settingFile": "Hallway"}
-]
-
-
 ##################
 # Basic settings #
 ##################

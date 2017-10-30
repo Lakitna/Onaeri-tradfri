@@ -1,38 +1,48 @@
 import os
 import importlib
-from settings import app
+from settings import Global
 import helper
+
+blacklist = ["Global", "Example", "__init__"]
+
+def _settingFileList():
+    """
+    Get list of setting files from settings folder.
+    """
+    ret = []
+    files = [f for f in os.listdir(__name__) if os.path.isfile(os.path.join(__name__, f))]
+    for f in files:
+        if f.endswith(Global.settingFileExtention):
+            f = f.split(".")[0] # Remove extention
+            if f not in blacklist:
+                ret.append( f )
+    return ret
+
+cycles = _settingFileList();
+if len(cycles) == 0:
+    print("No setting files found. Please create a file in the `settings` folder.")
+
+
 
 
 def get(settingFile=""):
     """
     Return correct setting file
     """
-    files = _settingFileList()
-    if not settingFile in files:
+    if not settingFile in cycles:
         settingFile = "Default"
     userSettings = importlib.import_module(__name__+"."+settingFile, package=None)
 
 
     # Some calculations on settings
-    userSettings.eveningSlopeDuration = round(userSettings.eveningSlopeDuration // app.minPerTimeCode)
-    userSettings.morningSlopeDuration = round(userSettings.morningSlopeDuration // app.minPerTimeCode)
+    userSettings.eveningSlopeDuration = round(userSettings.eveningSlopeDuration // Global.minPerTimeCode)
+    userSettings.morningSlopeDuration = round(userSettings.morningSlopeDuration // Global.minPerTimeCode)
 
 
     # Make sure all settings are within expectations
     integrityValidation(userSettings)
 
     return userSettings
-
-
-def _settingFileList():
-    ret = []
-    files = [f for f in os.listdir(__name__) if os.path.isfile(os.path.join(__name__, f))]
-    for f in files:
-        if f.endswith(app.settingFileExtention) and not f.startswith("_"):
-            ret.append( f.split(".")[0] )
-    return ret
-
 
 
 
@@ -51,7 +61,7 @@ def integrityValidation(userSettings):
     _checkIntegrity(userSettings.colorCorrect, 0, 100)
     _checkIntegrity(userSettings.morningSlopeDuration, check="unsigned")
     _checkIntegrity(userSettings.eveningSlopeDuration, check="unsigned")
-    print("Done")
+    helper.printDone()
 
 
 
@@ -91,17 +101,17 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
 
 
 print("Validating global settings: ", end='', flush=True)
-_checkIntegrity(app.minPerTimeCode, check="unsigned")
-_checkIntegrity(app.brightnessData['morning'], 0, 100)
-_checkIntegrity(app.brightnessData['evening'], 0, 100)
-_checkIntegrity(app.brightnessData['day'], 0, 100)
-_checkIntegrity(app.brightnessData['night'], 0, 100)
-_checkIntegrity(app.colorData['morning'], 0, 100)
-_checkIntegrity(app.colorData['evening'], 0, 100)
-_checkIntegrity(app.colorData['day'], 0, 100)
-_checkIntegrity(app.colorData['night'], 0, 100)
-_checkIntegrity(app.transitionTime, check="unsigned")
-_checkIntegrity(app.briRange, 1, 254)
-_checkIntegrity(app.colorRange, 2200, 4000)
-_checkIntegrity(app.totalDataPoints, check="unsigned")
-print("Done")
+_checkIntegrity(Global.minPerTimeCode, check="unsigned")
+_checkIntegrity(Global.brightnessData['morning'], 0, 100)
+_checkIntegrity(Global.brightnessData['evening'], 0, 100)
+_checkIntegrity(Global.brightnessData['day'], 0, 100)
+_checkIntegrity(Global.brightnessData['night'], 0, 100)
+_checkIntegrity(Global.colorData['morning'], 0, 100)
+_checkIntegrity(Global.colorData['evening'], 0, 100)
+_checkIntegrity(Global.colorData['day'], 0, 100)
+_checkIntegrity(Global.colorData['night'], 0, 100)
+_checkIntegrity(Global.transitionTime, check="unsigned")
+_checkIntegrity(Global.briRange, 1, 254)
+_checkIntegrity(Global.colorRange, 2200, 4000)
+_checkIntegrity(Global.totalDataPoints, check="unsigned")
+helper.printDone()

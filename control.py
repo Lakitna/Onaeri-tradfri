@@ -20,7 +20,7 @@ def state(val, lightIndex=None):
         return
 
     else:
-        print("[Control] Input value error. Allowed values 'True', 'False' or 'None'.")
+        helper.printError("[Control] Input value error. Allowed values 'True', 'False' or 'None'.")
         return
 
 
@@ -28,13 +28,13 @@ def color(val, lightIndex=None):
     """
     Update the color of one or more lamps.
     """
-    if helper.inRange(val, settings.app.colorRange):
+    if helper.inRange(val, settings.Global.colorRange):
         for l in _selectLights(lightIndex):
             command = l.light_control.set_kelvin_color(val)
             _sendCommand(command)
         return
     else:
-        print("[Control] Color input value error. Allowed range %s, %d given." % (settings.app.colorRange, val))
+        helper.printError("[Control] Color input value error. Allowed range %s, %d given." % (settings.Global.colorRange, val))
         return
 
 
@@ -42,13 +42,13 @@ def brightness(val, lightIndex=None):
     """
     Update the brightness of one or more lamps.
     """
-    if helper.inRange(val, settings.app.briRange):
+    if helper.inRange(val, settings.Global.briRange):
         for l in _selectLights(lightIndex):
-            command = l.light_control.set_dimmer(val, transition_time=settings.app.transitionTime*10)
+            command = l.light_control.set_dimmer(val, transition_time=settings.Global.transitionTime*10)
             _sendCommand(command)
         return
     else:
-        print("[Control] Brightness input value error. Allowed range %s, %d given." % (settings.app.briRange, val))
+        helper.printError("[Control] Brightness input value error. Allowed range %s, %d given." % (settings.Global.briRange, val))
         return
 
 
@@ -62,7 +62,7 @@ def _sendCommand(command, iteration=1):
         com.api(command)
     except error.RequestTimeout:
         print("[Control] Timeout error on try", iteration)
-        if iteration < settings.app.commandsTries:
+        if iteration < settings.Global.commandsTries:
             _sendCommand(command, iteration=iteration+1)
 
 
@@ -82,5 +82,5 @@ def _selectLights(lightIndex, *, stateChange=False):
             if com.lights[i].light_control.lights[0].state or stateChange:
                 ret.append(com.lights[i])
         except IndexError:
-            print("[Control] Selected lamp #%d is unkown" % i)
+            helper.printError("[Control] Selected lamp #%d is unkown" % i)
     return ret
