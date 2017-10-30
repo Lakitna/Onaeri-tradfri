@@ -36,7 +36,7 @@ timeKeeper = TimeKeeper()
 # Setup the cycles
 cycles = []
 for s in settings.app.cycles:
-    cycles.append( Cycle(s["lampIds"], settingFile=s["settingFile"]) )
+    cycles.append( Cycle(settingFile=s["settingFile"]) )
 
 
 # Start message

@@ -2,16 +2,17 @@ import settings
 import control
 from lookup import Lookup
 from observer import Observer
+import com
 
 
 class Cycle:
     """
     Cycle a group of lamps
     """
-    def __init__(self, group, settingFile):
+    def __init__(self, settingFile):
         print()
         self.cycleSettings = settings.get(settingFile)
-        self.group = group
+        self.group = self._lampNameToIds( settingFile )
         self.lookup = Lookup( self.cycleSettings )
         self.observer = Observer( self.group[0] ) # Always observe first lamp in group
 
@@ -50,3 +51,15 @@ class Cycle:
 
         # Prevent observer from overturning legal changes.
         self.observer.legalChange()
+
+
+    def _lampNameToIds(self, name):
+        ret = []
+        for i in range(len(com.lights)):
+            if name.lower() in com.lights[i].name.lower():
+                ret.append(i)
+
+        if len(ret) == 0:
+            ret = [0] # Default to lamp 0
+            print("[Cycle] Lamp with partial name `%s` not found" % name)
+        return ret
