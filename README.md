@@ -31,6 +31,7 @@ Download all the files in this repository and place it in a convenient location.
 
 ### 3. Change settings
 Change the settings in the `settings` folder
+
     1. In `Global.py` add the details to your gateway (`gatewayIp` and `gatewayKey`)
     2. Create a cycle by making a new settings file using `Template.py` as a template. For example name it `Bedroom.py`.
     3. Change your bedtime (`userAlarmTime`) and waketime (`userSleepTime`) in the new `Bedroom.py` settings file.
