@@ -20,7 +20,7 @@ def state(val, lightIndex=None):
         return
 
     else:
-        helper.printError("[Control] Input value error. Allowed values 'True', 'False' or 'None'.")
+        helper.printWarning("[Control] Input value error. Allowed values 'True', 'False' or 'None'.")
         return
 
 
@@ -34,7 +34,7 @@ def color(val, lightIndex=None):
             _sendCommand(command)
         return
     else:
-        helper.printError("[Control] Color input value error. Allowed range %s, %d given." % (settings.Global.colorRange, val))
+        helper.printWarning("[Control] Color input value error. Allowed range %s, %d given." % (settings.Global.colorRange, val))
         return
 
 
@@ -48,7 +48,7 @@ def brightness(val, lightIndex=None):
             _sendCommand(command)
         return
     else:
-        helper.printError("[Control] Brightness input value error. Allowed range %s, %d given." % (settings.Global.briRange, val))
+        helper.printWarning("[Control] Brightness input value error. Allowed range %s, %d given." % (settings.Global.briRange, val))
         return
 
 
@@ -61,7 +61,7 @@ def _sendCommand(command, iteration=1):
     try:
         com.api(command)
     except error.RequestTimeout:
-        print("[Control] Timeout error on try", iteration)
+        helper.printWarning("[Control] Timeout error on try", iteration)
         if iteration < settings.Global.commandsTries:
             _sendCommand(command, iteration=iteration+1)
 
