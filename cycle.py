@@ -17,6 +17,7 @@ class Cycle:
         self.group = self._lampNameToIds( self.name )
         self.lookup = Lookup( self.cycleSettings )
         self.observer = Observer( self.group[0] ) # Always observe first lamp in group
+        self.deviation = Deviation( self.cycleSettings )
 
         self._prevVals = [0,0]
 
@@ -30,8 +31,26 @@ class Cycle:
         if timeKeeper.update or self.observer.update:
             newVals = self.lookup.table( timeKeeper.timeCode )
 
-            # If the vals have changed or observer dictates update
-            if (not newVals == self._prevVals) or self.observer.update:
+            if self.observer.update:
+                self.deviation.change(newVals, self.observer.data)
+
+            # Don't run deviation routine when user turns on the lamp
+            if self.observer.turnedOn:
+                self.deviation.reset()
+
+            self.deviation.tick()
+            # Apply deviation to running cycle
+            newVals['brightness'] = helper.limitTo(
+                                        newVals['brightness'] + self.deviation.values['brightness'],
+                                        settings.Global.briRange
+                                    );
+            newVals['color'] = helper.limitTo(
+                                        newVals['color'] + self.deviation.values['color'],
+                                        settings.Global.colorRange
+                                    );
+
+            # If the lamp is on and (value is not the same as previous update or observer dictates update)
+            if self.observer.data['power'] and (not newVals == self._prevVals or self.observer.update):
                 self._update(newVals)
                 print("[%s] Setting cycle %s %s to {bri: %d, color: %d}" % (timeKeeper.timeStamp(), self.name, self.group, newVals['brightness'], newVals['color']))
 
@@ -68,3 +87,64 @@ class Cycle:
             ret = [0] # Default to lamp 0
             helper.printError("[Cycle] No lamps found with partial name `%s`. Use the Ikea Tradfri app to change the name of a lamp." % name)
         return ret
+
+
+
+
+
+
+
+class Deviation:
+    """
+    Allow the user to temporary deviate from the given cycle.
+    """
+    def __init__(self, userSettings):
+        self.duration = userSettings.deviationDuration
+        self.table = helper.sequenceResize(settings.Global.deviationData, self.duration)
+
+        self.counter = 0
+        self.active = False
+        self.values = {}
+        self.setValues = {}
+        self.reset()
+
+
+    def change(self, dataVals, changeVals):
+        """
+        Apply an observed change to deviation routine
+        """
+        self.reset()
+
+        if changeVals['power'] and self.duration > 0:
+            self.setValues['brightness'] = changeVals['brightness'] - dataVals['brightness']
+            self.setValues['color'] = changeVals['color'] - dataVals['color']
+
+            if not helper.inRange(self.setValues['brightness'], (-1,1)) \
+               or not helper.inRange(self.setValues['color'], (-10,10)):
+                self.active = True
+
+
+    def tick(self):
+        """
+        Progress by one tick
+        """
+        if self.active:
+            if self.counter >= self.duration:
+                self.reset()
+
+            multiplier = self.table[self.counter] / 100
+
+            self.values['brightness'] = round(self.setValues['brightness'] * multiplier)
+            self.values['color'] = round(self.setValues['color'] * multiplier)
+
+            self.counter += 1
+
+
+    def reset(self):
+        """
+        Reset the deviation routine
+        """
+        self.counter = 0
+        self.active = False
+        self.values = {'brightness': 0, 'color': 0}
+        self.setValues = self.values

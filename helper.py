@@ -1,5 +1,7 @@
 def printError(string):
     print("\033[1;31m%s\033[0;0m" % string)
+def printWarning(string):
+    print("\033[1;34m%s\033[0;0m" % string)
 def printDone():
     print("\033[0;32m%s\033[0;0m" % "Done")
 
@@ -21,6 +23,12 @@ def scale(val, inRange, outRange, decimals=1):
         ret = round(ret)
 
     return ret
+
+
+def limitTo(val, rnge):
+    if val < rnge[0]:  val = rnge[0]
+    if val > rnge[1]:  val = rnge[1]
+    return val
 
 
 def sequenceResize(source, length):

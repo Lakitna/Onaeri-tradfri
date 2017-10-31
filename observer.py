@@ -10,8 +10,9 @@ class Observer:
     def __init__(self, lampId=0):
         self.update = True
         self._lampId = lampId
-        self._prev = self._getData()
+        self.data = self._getData()
         self._legalChange = False
+        self.turnedOn = False
 
 
     def look(self):
@@ -22,12 +23,16 @@ class Observer:
 
         self.update = False
 
+        self.turnedOn = False
+        if self.data['power'] == False and newData['power'] == True:
+            self.turnedOn = True
+
         if not self._legalChange:
-            if not self._sameData(newData, self._prev):
+            if not self._sameData(newData, self.data):
                 self.update = True
 
         # Prep for next iteration
-        self._prev = newData
+        self.data = newData
         self._legalChange = False
 
 
@@ -43,7 +48,8 @@ class Observer:
         Compare new to previous observed values. Returns True when both sets are the same.
         """
         for key in new:
-            if not prev[key] == new[key] and not (key == 'state' and new[key] == False):
+            # if not prev[key] == new[key] and not (key == 'state' and new[key] == False):
+            if not prev[key] == new[key]:
                 print()
                 print("[Observer] Illegal change in lamp %d: %s changed to %s" % (self._lampId, key, new[key]))
                 return False
@@ -61,7 +67,11 @@ class Observer:
         except error.RequestTimeout:
             sys.stdout.write("\b|")
             sys.stdout.flush()
-            return self._prev
+            return self.data
 
         light = device.light_control.lights[0]
-        return {'state': light.state, 'bright': light.dimmer, 'color': light.kelvin_color_inferred}
+
+        power = False
+        if device.reachable:  power = light.state
+
+        return {'brightness': light.dimmer, 'color': light.kelvin_color_inferred, 'power': power}

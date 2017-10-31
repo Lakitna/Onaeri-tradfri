@@ -40,6 +40,7 @@ def get(settingFile=""):
     # Some calculations on settings
     userSettings.eveningSlopeDuration = round(userSettings.eveningSlopeDuration // Global.minPerTimeCode)
     userSettings.morningSlopeDuration = round(userSettings.morningSlopeDuration // Global.minPerTimeCode)
+    userSettings.deviationDuration = round(userSettings.deviationDuration // Global.minPerTimeCode)
 
 
     # Make sure all settings are within expectations
@@ -64,6 +65,7 @@ def integrityValidation(userSettings):
     _checkIntegrity(userSettings.colorCorrect, 0, 100)
     _checkIntegrity(userSettings.morningSlopeDuration, check="unsigned")
     _checkIntegrity(userSettings.eveningSlopeDuration, check="unsigned")
+    _checkIntegrity(userSettings.deviationDuration, check="unsigned")
     helper.printDone()
 
 
@@ -117,4 +119,5 @@ _checkIntegrity(Global.transitionTime, check="unsigned")
 _checkIntegrity(Global.briRange, 1, 254)
 _checkIntegrity(Global.colorRange, 2200, 4000)
 _checkIntegrity(Global.totalDataPoints, check="unsigned")
+_checkIntegrity(Global.deviationData, 0, 100)
 helper.printDone()
