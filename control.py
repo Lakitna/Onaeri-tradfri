@@ -61,7 +61,7 @@ def _sendCommand(command, iteration=1):
     try:
         com.api(command)
     except error.RequestTimeout:
-        helper.printWarning("[Control] Timeout error on try", iteration)
+        helper.printWarning("[Control] Timeout error on try %d" % iteration)
         if iteration < settings.Global.commandsTries:
             _sendCommand(command, iteration=iteration+1)
 
