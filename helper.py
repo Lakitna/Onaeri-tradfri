@@ -25,6 +25,12 @@ def scale(val, inRange, outRange, decimals=1):
     return ret
 
 
+def limitTo(val, rnge):
+    if val < rnge[0]:  val = rnge[0]
+    if val > rnge[1]:  val = rnge[1]
+    return val
+
+
 def sequenceResize(source, length):
     """
     Crude way of resizing a data sequence. Shrinking is here more accurate than expanding.

@@ -9,9 +9,10 @@ class Observer:
     """
     def __init__(self, lampIds=[0]):
         self.update = True
-        self._lampIds = lampIds
-        self._prev = self._getData()
+        self._lampId = lampId
+        self.data = self._getData()
         self._legalChange = False
+        self.turnedOn = False
 
 
     def look(self):
@@ -22,12 +23,16 @@ class Observer:
 
         self.update = False
 
+        self.turnedOn = False
+        if self.data['power'] == False and newData['power'] == True:
+            self.turnedOn = True
+
         if not self._legalChange:
-            if not self._sameData(newData, self._prev):
+            if not self._sameData(newData, self.data):
                 self.update = True
 
         # Prep for next iteration
-        self._prev = newData
+        self.data = newData
         self._legalChange = False
 
 
@@ -45,7 +50,7 @@ class Observer:
         for i in range(len(new)):
             lamp = new[i]
             for key in lamp:
-                if not prev[i][key] == new[i][key] and not (key == 'state' and new[i][key] == False):
+                if not prev[i][key] == new[i][key]:
                     print()
                     print("[Observer] Illegal change in lamp %d: %s changed to %s" % (self._lampIds[i], key, new[i][key]))
                     return False
@@ -66,7 +71,10 @@ class Observer:
                 sys.stdout.write("\b|")
                 sys.stdout.flush()
                 return self._prev
+              
+            power = False
+            if device.reachable:  power = light.state
 
             light = device.light_control.lights[0]
-            ret.append( {'state': light.state, 'bright': light.dimmer, 'color': light.kelvin_color_inferred} )
+            ret.append( {'brightness': light.dimmer, 'color': light.kelvin_color_inferred, 'power': power} )
         return ret
