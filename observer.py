@@ -7,9 +7,9 @@ class Observer:
     """
     Observe changes in a lamp
     """
-    def __init__(self, lampId=0):
+    def __init__(self, lampIds=[0]):
         self.update = True
-        self._lampId = lampId
+        self._lampIds = lampIds
         self._prev = self._getData()
         self._legalChange = False
 
@@ -42,11 +42,13 @@ class Observer:
         """
         Compare new to previous observed values. Returns True when both sets are the same.
         """
-        for key in new:
-            if not prev[key] == new[key] and not (key == 'state' and new[key] == False):
-                print()
-                print("[Observer] Illegal change in lamp %d: %s changed to %s" % (self._lampId, key, new[key]))
-                return False
+        for i in range(len(new)):
+            lamp = new[i]
+            for key in lamp:
+                if not prev[i][key] == new[i][key] and not (key == 'state' and new[i][key] == False):
+                    print()
+                    print("[Observer] Illegal change in lamp %d: %s changed to %s" % (self._lampIds[i], key, new[i][key]))
+                    return False
         return True
 
 
@@ -54,14 +56,17 @@ class Observer:
         """
         Get lamp info from gateway.
         """
-        device = lights[self._lampId]
+        ret = []
+        for lampId in self._lampIds:
+            device = lights[lampId]
 
-        try:
-            api(device.update())
-        except error.RequestTimeout:
-            sys.stdout.write("\b|")
-            sys.stdout.flush()
-            return self._prev
+            try:
+                api(device.update())
+            except error.RequestTimeout:
+                sys.stdout.write("\b|")
+                sys.stdout.flush()
+                return self._prev
 
-        light = device.light_control.lights[0]
-        return {'state': light.state, 'bright': light.dimmer, 'color': light.kelvin_color_inferred}
+            light = device.light_control.lights[0]
+            ret.append( {'state': light.state, 'bright': light.dimmer, 'color': light.kelvin_color_inferred} )
+        return ret
