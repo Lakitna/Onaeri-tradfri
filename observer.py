@@ -9,9 +9,9 @@ class Observer:
     """
     def __init__(self, lampIds=[0]):
         self.update = True
-        self._lampId = lampId
-        self.data = self._getData()
-        self._legalChange = False
+        self._lampIds = lampIds
+        self.data = {'brightness': 0, 'color': 0, 'power': False}
+        self._legalChange = True
         self.turnedOn = False
 
 
@@ -19,20 +19,23 @@ class Observer:
         """
         Look for changes in lamp values
         """
-        newData = self._getData()
-
+        self.turnedOn = False
         self.update = False
 
-        self.turnedOn = False
-        if self.data['power'] == False and newData['power'] == True:
-            self.turnedOn = True
+        newData = self._getData()
+
+
+        for i in range(len(newData)):
+            if self.data['power'] == False and newData[i]['power'] == True:
+                self.turnedOn = True
+
 
         if not self._legalChange:
-            if not self._sameData(newData, self.data):
-                self.update = True
+            self.data = self._sameData(newData, self.data)
+        else:
+            self.data = newData[0]
 
-        # Prep for next iteration
-        self.data = newData
+
         self._legalChange = False
 
 
@@ -50,11 +53,12 @@ class Observer:
         for i in range(len(new)):
             lamp = new[i]
             for key in lamp:
-                if not prev[i][key] == new[i][key]:
+                if not prev[key] == new[i][key]:
                     print()
                     print("[Observer] Illegal change in lamp %d: %s changed to %s" % (self._lampIds[i], key, new[i][key]))
-                    return False
-        return True
+                    self.update = True
+                    return lamp
+        return new[0]
 
 
     def _getData(self):
@@ -71,10 +75,11 @@ class Observer:
                 sys.stdout.write("\b|")
                 sys.stdout.flush()
                 return self._prev
-              
+
+            light = device.light_control.lights[0]
+
             power = False
             if device.reachable:  power = light.state
 
-            light = device.light_control.lights[0]
             ret.append( {'brightness': light.dimmer, 'color': light.kelvin_color_inferred, 'power': power} )
         return ret

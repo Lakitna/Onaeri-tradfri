@@ -119,6 +119,8 @@ class Deviation:
         """
         self.reset()
 
+        # print(changeVals)
+
         if changeVals['power'] and self.duration > 0:
             self.setValues['brightness'] = changeVals['brightness'] - dataVals['brightness']
             self.setValues['color'] = changeVals['color'] - dataVals['color']

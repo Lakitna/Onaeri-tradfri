@@ -74,6 +74,8 @@ def _selectLights(lightIndex, *, stateChange=False):
         lightIndex = []
         for i in range(len(com.lights)):
             lightIndex.append(i)
+    if type(lightIndex) is int:
+        lightIndex = [lightIndex]
 
 
     ret = []
