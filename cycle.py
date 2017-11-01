@@ -38,40 +38,44 @@ class Cycle:
             if self.observer.turnedOn:
                 self.deviation.reset()
 
-            self.deviation.tick()
-            # Apply deviation to running cycle
-            newVals['brightness'] = helper.limitTo(
-                                        newVals['brightness'] + self.deviation.values['brightness'],
-                                        settings.Global.briRange
-                                    );
-            newVals['color'] = helper.limitTo(
-                                        newVals['color'] + self.deviation.values['color'],
-                                        settings.Global.colorRange
-                                    );
+            newVals = self.deviation.apply(newVals)
 
-            # If the lamp is on and (value is not the same as previous update or observer dictates update)
-            if self.observer.data['power'] and (not newVals == self._prevVals or self.observer.update):
-                self._update(newVals)
+
+            if self._updateLampState( newVals ):
+                print("[%s] Setting cycle %s %s to {power: %s}" % (timeKeeper.timeStamp(), self.name, self.group, newVals['power']))
+
+            if self._updateLampValues( newVals ):
                 print("[%s] Setting cycle %s %s to {bri: %d, color: %d}" % (timeKeeper.timeStamp(), self.name, self.group, newVals['brightness'], newVals['color']))
+
 
             # Prep for next loop
             self._prevVals = newVals
 
 
-    def _update(self, vals):
+    def _updateLampValues(self, vals):
         """
-        Updates lamps in cycle group to new values.
+        Update lamp values (brightness & color)
         """
-        control.color( vals['color'], self.group )
-        control.brightness( vals['brightness'], self.group )
+        # If the lamp is on and (value is not the same as previous update or observer dictates update)
+        if self.observer.data['power'] and (not vals == self._prevVals or self.observer.update):
+            control.color( vals['color'], self.group )
+            control.brightness( vals['brightness'], self.group )
 
-        # Don't allow the observer to overwrite turning on a lamp
-        if not self.observer.update and vals['power'] is not None:
+            self.observer.legalChange()
+            return True
+        return False
+
+
+    def _updateLampState(self, state):
+        """
+        Update lamp state (on/off)
+        """
+        state = state['power']
+        if not self.observer.update and state is not None:
             if self.cycleSettings.automaticStateChange:
-                control.state( vals['power'], self.group )
-
-        # Prevent observer from overturning legal changes.
-        self.observer.legalChange()
+                control.state( state, self.group )
+                return True
+        return False
 
 
     def _lampNameToIds(self, name):
@@ -124,7 +128,7 @@ class Deviation:
                 self.active = True
 
 
-    def tick(self):
+    def apply(self, newVals):
         """
         Progress by one tick
         """
@@ -137,7 +141,17 @@ class Deviation:
             self.values['brightness'] = round(self.setValues['brightness'] * multiplier)
             self.values['color'] = round(self.setValues['color'] * multiplier)
 
+            newVals['brightness'] = helper.limitTo(
+                                        newVals['brightness'] + self.values['brightness'],
+                                        settings.Global.briRange
+                                    );
+            newVals['color'] = helper.limitTo(
+                                        newVals['color'] + self.values['color'],
+                                        settings.Global.colorRange
+                                    );
             self.counter += 1
+
+        return newVals
 
 
     def reset(self):
