@@ -74,7 +74,7 @@ class Observer:
             except error.RequestTimeout:
                 sys.stdout.write("\b|")
                 sys.stdout.flush()
-                return self._prev
+                return [self.data]
 
             light = device.light_control.lights[0]
 
