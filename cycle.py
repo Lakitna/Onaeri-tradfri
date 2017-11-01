@@ -16,7 +16,7 @@ class Cycle:
         self.cycleSettings = settings.get( self.name )
         self.group = self._lampNameToIds( self.name )
         self.lookup = Lookup( self.cycleSettings )
-        self.observer = Observer( self.group[0] ) # Always observe first lamp in group
+        self.observer = Observer( self.group )
         self.deviation = Deviation( self.cycleSettings )
 
         self._prevVals = [0,0]
@@ -118,6 +118,8 @@ class Deviation:
         Apply an observed change to deviation routine
         """
         self.reset()
+
+        # print(changeVals)
 
         if changeVals['power'] and self.duration > 0:
             self.setValues['brightness'] = changeVals['brightness'] - dataVals['brightness']
