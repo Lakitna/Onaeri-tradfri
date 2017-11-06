@@ -1,7 +1,7 @@
 # Onæri Trådfri
 Controller for the Ikea Trådfri line of smart lights based on the Onæri principles. This is an extra command layer on top of the existing ones with the goal of improving the user's sleep rhythm.
 
-Onæri Trådfri is built upon [Pytradfri](https://github.com/ggravlingen/pytradfri).
+Onæri Trådfri is an implementation of [Onaeri](https://github.com/Lakitna/Onaeri) built upon [Pytradfri](https://github.com/ggravlingen/pytradfri).
 
 
 ## Features
