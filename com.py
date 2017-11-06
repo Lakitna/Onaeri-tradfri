@@ -1,5 +1,5 @@
 import settings
-import helper
+from onaeri import helper
 
 print("Getting network data from gateway: ", end="", flush=True)
 
@@ -27,4 +27,4 @@ helper.printDone()
 
 
 # Get list of all controllable lamps
-lights = [dev for dev in devices if dev.has_light_control]
+light_objects = [dev for dev in devices if dev.has_light_control]

@@ -4,52 +4,46 @@ import time
 from pytradfri import error
 import com
 import settings
-import helper
+from onaeri import helper, data
 
 
-def state(val, lightIndex=None):
+def power(api):
     """
-    Turn one or more lamps on or off.
+    Turn one or more lamps in one or more cycles on or off.
     """
-    if val is None:  return
-    if val is True or val is False:
-        print("[Control] State change %s to %s" % (lightIndex, val))
-        for l in _selectLights(lightIndex, stateChange=True):
-            command = l.light_control.set_state(val)
-            _sendCommand(command)
-        return
+    for cycle in api.cycles:
+        if cycle.update and not cycle.lamp.power == None:
 
-    else:
-        helper.printWarning("[Control] Input value error. Allowed values 'True', 'False' or 'None'.")
-        return
+            for l in _selectLights(cycle.group, stateChange=True):
+                command = l.light_control.set_state(cycle.lamp.power)
+                _sendCommand(command)
+            continue
 
 
-def color(val, lightIndex=None):
+def color(api):
     """
-    Update the color of one or more lamps.
+    Update the color of one or more lamps in one or more cycles.
     """
-    if helper.inRange(val, settings.Global.colorRange):
-        for l in _selectLights(lightIndex):
-            command = l.light_control.set_kelvin_color(val)
-            _sendCommand(command)
-        return
-    else:
-        helper.printWarning("[Control] Color input value error. Allowed range %s, %d given." % (settings.Global.colorRange, val))
-        return
+    for cycle in api.cycles:
+        if cycle.update and not cycle.lamp.color == None:
+
+            for l in _selectLights(cycle.group):
+                command = l.light_control.set_kelvin_color(cycle.lamp.color)
+                _sendCommand(command)
+            continue
 
 
-def brightness(val, lightIndex=None):
-    """
-    Update the brightness of one or more lamps.
-    """
-    if helper.inRange(val, settings.Global.briRange):
-        for l in _selectLights(lightIndex):
-            command = l.light_control.set_dimmer(val, transition_time=settings.Global.transitionTime*10)
-            _sendCommand(command)
-        return
-    else:
-        helper.printWarning("[Control] Brightness input value error. Allowed range %s, %d given." % (settings.Global.briRange, val))
-        return
+def brightness(api):
+    for cycle in api.cycles:
+        if cycle.update and not cycle.lamp.brightness == None:
+
+            for l in _selectLights(cycle.group):
+                command = l.light_control.set_dimmer(cycle.lamp.brightness, transition_time=settings.Global.transitionTime*10)
+                _sendCommand(command)
+            continue
+
+
+
 
 
 
@@ -72,7 +66,7 @@ def _selectLights(lightIndex, *, stateChange=False):
     """
     if lightIndex == None:
         lightIndex = []
-        for i in range(len(com.lights)):
+        for i in range(len(com.light_objects)):
             lightIndex.append(i)
     if type(lightIndex) is int:
         lightIndex = [lightIndex]
@@ -81,8 +75,8 @@ def _selectLights(lightIndex, *, stateChange=False):
     ret = []
     for i in lightIndex:
         try:
-            if com.lights[i].light_control.lights[0].state or stateChange:
-                ret.append(com.lights[i])
+            if com.light_objects[i].light_control.lights[0].state or stateChange:
+                ret.append(com.light_objects[i])
         except IndexError:
             helper.printError("[Control] Selected lamp #%d is unkown" % i)
     return ret
