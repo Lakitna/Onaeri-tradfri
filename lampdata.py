@@ -1,5 +1,5 @@
-from onaeri.lamp import Lamp
-from onaeri.helper import printWarning
+from Onaeri.lamp import Lamp
+from Onaeri.helper import printWarning
 from com import light_objects, api
 from pytradfri import error
 

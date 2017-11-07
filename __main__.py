@@ -6,10 +6,11 @@ __author__ = 'Sander van Beek'
 print("\n" * 100)
 print("Onaeri Tradfri v%s" % __version__)
 
-from onaeri import Onaeri
 
 
-import settings
+from Onaeri import Onaeri
+
+import Onaeri.settings as settings
 import control
 import com
 import lampdata
@@ -17,7 +18,7 @@ from time import sleep
 
 
 onaeri = Onaeri( settings, lampdata.now() )
-print("\nNow active\n")
+print("\n----------------------------------------------------\n")
 
 
 

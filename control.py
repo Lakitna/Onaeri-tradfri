@@ -3,8 +3,8 @@ import time
 
 from pytradfri import error
 import com
-import settings
-from onaeri import helper, data
+import Onaeri.settings as settings
+from Onaeri import helper, data
 
 
 def power(api):
