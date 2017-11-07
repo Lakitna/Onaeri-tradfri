@@ -1,7 +1,7 @@
 #!/bin/sh
 echo "Linux setup running. This will take a while and might require some user input."
 
-pip3 install pytradfri --upgrade
+sudo pip3 install pytradfri --upgrade
 
 
 sudo apt-get update
