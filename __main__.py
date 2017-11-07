@@ -1,16 +1,16 @@
+"""
+Tradfri wrapper for Onaeri API
+https://github.com/Lakitna/Onaeri-tradfri
+"""
 
-__version__ = '0.3'
-__author__ = 'Sander van Beek'
+__version__ = '0.4'
 
 
 print("\n" * 100)
 print("Onaeri Tradfri v%s" % __version__)
 
 
-
-from Onaeri import Onaeri
-
-import Onaeri.settings as settings
+from Onaeri import Onaeri, settings
 import control
 import com
 import lampdata
@@ -18,26 +18,27 @@ from time import sleep
 
 
 onaeri = Onaeri( settings, lampdata.now() )
-print("\n----------------------------------------------------\n")
+print("\n--------------------------------------------------\n")
 
 
 
-def heartbeat(position="high"):
-    if position == "high":
+def heartbeat(position=True):
+    """
+    Display network heartbeat
+    """
+    if position:
         print("\b♥", end="", flush=True)
         return
-    if position == "low":
+    else:
         print("\b ", end="", flush=True)
         print("\b", end="")
         return
 
 
-
 while True:
-    # Display network heartbeat
-    heartbeat("high")
+    heartbeat(True)
     lampData = lampdata.now()
-    heartbeat("low")
+    heartbeat(False)
 
     # Progress all cycles and pass the current state of all lamps
     onaeri.tick( lampData )
@@ -49,12 +50,16 @@ while True:
                 print('\t%s: %s' % (cycle.name, cycle.lamp))
 
 
-        heartbeat("high")
+        heartbeat(True)
         control.color( onaeri )
         control.brightness( onaeri )
         control.power( onaeri )
-        heartbeat("low")
+        heartbeat(False)
 
 
     # Slow down a bit, no stress brah
-    sleep( settings.Global.mainLoopDelay )
+    try:
+        sleep( settings.Global.mainLoopDelay )
+    except KeyboardInterrupt:
+        print("\nKeyboard interrupt. Exiting.")
+        exit()

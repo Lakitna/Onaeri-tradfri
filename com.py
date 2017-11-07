@@ -87,10 +87,10 @@ with open('%s/gateway_psk.txt' % filePath, 'a+') as file:
         helper.printWarning("\nEnter key on the back of your Gateway:", end=" ")
         key = input()
         if len(key) < 16:
-            print("Key is too short. It should be 16 characters")
+            helper.printError("Key is too short. It should be 16 characters")
             exit()
         elif len(key) > 16:
-            print("Key is too long. It should be 16 characters")
+            helper.printError("Key is too long. It should be 16 characters")
             exit()
         else:
             psk = api_factory.generate_psk(key)
@@ -108,8 +108,8 @@ devices_command = gateway.get_devices()
 devices_commands = api(devices_command)
 devices = api(devices_commands)
 
-helper.printDone()
-
 
 # Get list of all controllable lamps
 light_objects = [dev for dev in devices if dev.has_light_control]
+
+helper.printDone()
