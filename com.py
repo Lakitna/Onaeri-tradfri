@@ -63,6 +63,8 @@ def findGatewayIp():
 
 filePath = path.dirname(path.abspath(__file__))
 
+with open('%s/gateway_ip.txt' % filePath, 'a') as file:
+    pass
 with open('%s/gateway_ip.txt' % filePath, 'r+') as file:
     file.seek(0)
     ip = file.read().strip()
