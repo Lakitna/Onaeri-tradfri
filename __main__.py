@@ -27,7 +27,7 @@ def heartbeat(position=True):
     Display network heartbeat
     """
     if position:
-        print("\b♥", end="", flush=True)
+        print("\b\033[1;31m♥\033[0;0m", end="", flush=True)
         return
     else:
         print("\b ", end="", flush=True)

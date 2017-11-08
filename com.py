@@ -35,7 +35,8 @@ def findGatewayIp():
             s.close()
             return ip
         except OSError:
-            helper.printError("\nCouldn't find the host IP. Are you connected to the network?")
+            print()
+            helper.printError("Couldn't find the IP of this machine. Are you connected to the network?")
             exit()
     ip = hostIp()
 
