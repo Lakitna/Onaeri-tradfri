@@ -3,7 +3,7 @@ Tradfri wrapper for Onaeri API
 https://github.com/Lakitna/Onaeri-tradfri
 """
 
-__version__ = '0.4'
+__version__ = '0.5'
 
 
 print("\n" * 100)

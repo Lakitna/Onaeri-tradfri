@@ -34,6 +34,9 @@ def color(api):
 
 
 def brightness(api):
+    """
+    Update the brightness of one or more lamps in one or more cycles.
+    """
     for cycle in api.cycles:
         if cycle.update and not cycle.lamp.brightness == None:
 

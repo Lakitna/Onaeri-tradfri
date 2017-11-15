@@ -4,8 +4,7 @@ settings/Jurrien.py
 settings/Hallway.py
 
 # Secret information
-gateway_psk.txt
-gateway_ip.txt
+gateway_settings.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
