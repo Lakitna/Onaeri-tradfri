@@ -29,7 +29,7 @@ class Network:
             helper.printWarning("No valid Security Code found.")
             helper.printWarning("Please enter the Security Code on the back of your Gateway:", end=" ")
             key = input().strip()
-            if len(key < 2):
+            if len(key) < 2:
                 helper.printError("No Security Code provided by user. Exiting.")
                 exit()
             else:
@@ -151,7 +151,7 @@ class Network:
             updateAPR()
 
         # First attempt at finding gateway by looking for its name
-        ip = consultARP('tradfrii')
+        ip = consultARP('tradfri')
 
         if ip is None:
             if len(self._settings['mac']) < 2: # If mac address is unkown
