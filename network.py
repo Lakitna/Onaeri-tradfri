@@ -118,7 +118,6 @@ class Network:
                 s.connect(("8.8.8.8", 80))
                 ip = s.getsockname()[0]
                 s.close()
-                return ip
             except OSError:
                 print()
                 helper.printError("Couldn't find the IP of this machine. Are you connected to the network?")
