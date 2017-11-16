@@ -20,14 +20,14 @@ class Network:
 
 
         if not self._settings['ip'] or not self.ipActive( self._settings['ip'] ):
-            logWarn("No valid IP found.", end=" ", flush=True)
+            logWarn("No valid IP found in storage.", end=" ", flush=True)
             self._settings['ip'] = self.findGatewayIp()
             self.updateSettings( self._settings )
 
         if not len(self._settings['psk']) == 16:
             # Generate new key
             log()
-            logWarn("No valid Security Code found.")
+            logWarn("No valid Security Code found in storage.")
             logWarn("Please enter the Security Code on the back of your Gateway:", end=" ")
             key = input().strip()
             if len(key) < 2:
@@ -126,13 +126,17 @@ class Network:
             subprocess.call("fping -c 1 -g %s/24 2> /dev/null | grep HackToHideOutput" % ip, shell=True)
 
 
-        def consultARP(keyword):
+        def consultARP(regex):
             """
-            Look for given keyword in ARP records and return associated IP.
+            Look for given regular expression in ARP records and return associated IP.
             """
-            proc = subprocess.Popen("arp -a | grep %s --ignore-case" % keyword, stdout=subprocess.PIPE, shell=True)
+            proc = subprocess.Popen("arp -a | grep -E \"%s\" --ignore-case" % regex, stdout=subprocess.PIPE, shell=True)
             (arpRecord, err) = proc.communicate()
             arpRecord = str(arpRecord)
+
+            # If there is more than one arp record returned
+            if len(arpRecord.split("\\n")) > 2:
+                return None
 
             # Find ip4 address in arp record
             regex = re.compile('([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})')
@@ -149,7 +153,7 @@ class Network:
             updateAPR()
 
         # First attempt at finding gateway by looking for its name
-        ip = consultARP('tradfri')
+        ip = consultARP("gw\-[a-z0-9]{12}")
 
         if ip is None:
             if len(self._settings['mac']) < 2: # If mac address is unkown

@@ -15,7 +15,7 @@ def now():
         try:
             api(device.update())
         except error.RequestTimeout:
-            print("\b")
+            print("\b", end="")
             logWarn("×")
             return None
 
