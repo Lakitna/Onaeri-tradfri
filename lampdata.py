@@ -15,7 +15,8 @@ def now():
         try:
             api(device.update())
         except error.RequestTimeout:
-            logWarn("\b×")
+            print("\b")
+            logWarn("×")
             return None
 
         light = device.light_control.lights[0]
