@@ -8,9 +8,6 @@ from pytradfri.api.libcoap_api import APIFactory
 
 network = Network()
 
-log("Getting network data from Gateway: ", end="", flush=True)
-
-
 api_factory = APIFactory(network.ip)
 api_factory.psk = network.psk
 
@@ -35,4 +32,4 @@ except error.RequestTimeout:
 # Get list of all controllable lamps
 light_objects = [dev for dev in devices if dev.has_light_control]
 
-logSuccess("Done")
+logSuccess("Done", end="\n\n")

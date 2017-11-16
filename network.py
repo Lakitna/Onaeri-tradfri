@@ -9,7 +9,7 @@ from pytradfri.api.libcoap_api import APIFactory
 
 class Network:
     def __init__(self):
-        log("Validating Gateway connection information: ", end="", flush=True)
+        log("Establishing connection with the Gateway: ", end="", flush=True)
         self.filePath = "%s/gateway_settings.txt" % path.dirname(path.abspath(__file__))
         self._comVars = ['ip', 'psk', 'mac']
         self._separator = "="
@@ -43,8 +43,6 @@ class Network:
         # Make easily available after import
         self.psk = self._settings['psk']
         self.ip = self._settings['ip']
-
-        logSuccess("Done")
 
 
 

@@ -10,7 +10,7 @@ print("\n" * 100)
 
 from Onaeri.logger import *
 
-log("\nOnaeri Tradfri v%s\n" % __version__)
+log("Onaeri Tradfri v%s\n" % __version__)
 
 from Onaeri import Onaeri, settings
 import control
