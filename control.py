@@ -4,7 +4,8 @@ import time
 from pytradfri import error
 import com
 import Onaeri.settings as settings
-from Onaeri import helper, data
+from Onaeri import data
+from Onaeri.logger import *
 
 
 def power(api):
@@ -58,7 +59,7 @@ def _sendCommand(command, iteration=1):
     try:
         com.api(command)
     except error.RequestTimeout:
-        helper.printWarning("[Control] Timeout error on try %d" % iteration)
+        logWarn("[Control] Timeout error on try %d" % iteration)
         if iteration < settings.Global.commandsTries:
             _sendCommand(command, iteration=iteration+1)
 
@@ -81,5 +82,6 @@ def _selectLights(lightIndex, *, stateChange=False):
             if com.light_objects[i].light_control.lights[0].state or stateChange:
                 ret.append(com.light_objects[i])
         except IndexError:
-            helper.printError("[Control] Selected lamp #%d is unkown" % i)
+            log
+            Error("[Control] Selected lamp #%d is unkown" % i)
     return ret

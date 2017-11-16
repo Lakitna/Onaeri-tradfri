@@ -3,12 +3,13 @@ import socket
 import subprocess
 import re
 from Onaeri import helper
+from Onaeri.logger import *
 from pytradfri.api.libcoap_api import APIFactory
 
 
 class Network:
     def __init__(self):
-        print("Validating Gateway connection information: ", end="", flush=True)
+        log("Validating Gateway connection information: ", end="", flush=True)
         self.filePath = "%s/gateway_settings.txt" % path.dirname(path.abspath(__file__))
         self._comVars = ['ip', 'psk', 'mac']
         self._separator = "="
@@ -19,23 +20,23 @@ class Network:
 
 
         if not self._settings['ip'] or not self.ipActive( self._settings['ip'] ):
-            helper.printWarning("No valid IP found.", end=" ", flush=True)
+            logWarn("No valid IP found.", end=" ", flush=True)
             self._settings['ip'] = self.findGatewayIp()
             self.updateSettings( self._settings )
 
         if not len(self._settings['psk']) == 16:
             # Generate new key
-            print()
-            helper.printWarning("No valid Security Code found.")
-            helper.printWarning("Please enter the Security Code on the back of your Gateway:", end=" ")
+            log()
+            logWarn("No valid Security Code found.")
+            logWarn("Please enter the Security Code on the back of your Gateway:", end=" ")
             key = input().strip()
             if len(key) < 2:
-                helper.printError("No Security Code provided by user. Exiting.")
+                logError("No Security Code provided by user. Exiting.")
                 exit()
             else:
                 api_factory = APIFactory(self._settings['ip'])
                 self._settings['psk'] = api_factory.generate_psk(key)
-                print('Generated PSK: ', self._settings['psk'])
+                log('Generated PSK: ', self._settings['psk'])
                 self.updateSettings(self._settings)
 
 
@@ -43,7 +44,7 @@ class Network:
         self.psk = self._settings['psk']
         self.ip = self._settings['ip']
 
-        helper.printDone()
+        logSuccess("Done")
 
 
 
@@ -70,7 +71,7 @@ class Network:
                 val = line[1]
 
                 if not key in self._comVars:
-                    helper.printError("Gateway settings invalid. Unexpected parameter '%s'." % key)
+                    logError("Gateway settings invalid. Unexpected parameter '%s'." % key)
                     exit()
 
                 ret[key] = val
@@ -84,7 +85,7 @@ class Network:
         with open(self.filePath, 'w') as f:
             for key in values:
                 if not key in self._comVars:
-                    helper.printError("Gateway setting invalid. Tried to write unexpected parameter '%s'." % key)
+                    logError("Gateway setting invalid. Tried to write unexpected parameter '%s'." % key)
                     exit()
 
                 f.write("%s%s%s\n" % (key, self._separator, values[key]))
@@ -119,8 +120,8 @@ class Network:
                 ip = s.getsockname()[0]
                 s.close()
             except OSError:
-                print()
-                helper.printError("Couldn't find the IP of this machine. Are you connected to the network?")
+                log()
+                logError("Couldn't find the IP of this machine. Are you connected to the network?")
                 exit()
 
             # Ping entire subnet
@@ -144,7 +145,7 @@ class Network:
             return arpRecord[match.start():match.end()]
 
 
-        helper.printWarning("Looking for Gateway on local network.", end=" ", flush=True)
+        logWarn("Looking for Gateway on local network.", end=" ", flush=True)
 
         if not iteration:
             updateAPR()
@@ -154,9 +155,9 @@ class Network:
 
         if ip is None:
             if len(self._settings['mac']) < 2: # If mac address is unkown
-                print()
-                helper.printError("Couldn't find gateway by its name.")
-                helper.printError("Please enter the Serial Number on the back of the device:", end=" ")
+                log()
+                logError("Couldn't find gateway by its name.")
+                logError("Please enter the Serial Number on the back of the device:", end=" ")
                 mac = input().replace("-", ":")
                 if len(mac) < 2:
                     exit()
@@ -165,16 +166,16 @@ class Network:
 
         if ip is None:
             if not iteration:
-                helper.printError("Couldn't find any gateway by name or Serial Number. Values have been reset, trying again with a blank slate.")
+                logError("Couldn't find any gateway by name or Serial Number. Values have been reset, trying again with a blank slate.")
                 self._settings['mac'] = ''
                 ip = self.findGatewayIp(True)
             else:
-                helper.printError("Couldn't find any gateway by name or Serial Number.")
-                helper.printError("Are you sure the gateway is on?")
-                helper.printError("Are you connected to the correct network?")
+                logError("Couldn't find any gateway by name or Serial Number.")
+                logError("Are you sure the gateway is on?")
+                logError("Are you connected to the correct network?")
                 exit()
 
         if not ip is None:
             if not iteration:
-                print("\033[7;32m%s\033[0;0m" % " IP found ", end=" ")
+                logSuccess("IP found", end=" ")
             return ip

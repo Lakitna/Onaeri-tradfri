@@ -3,12 +3,14 @@ Tradfri wrapper for Onaeri API
 https://github.com/Lakitna/Onaeri-tradfri
 """
 
-__version__ = '0.5'
+__version__ = '0.6.0'
 
 
 print("\n" * 100)
-print("Onaeri Tradfri v%s" % __version__)
 
+from Onaeri.logger import *
+
+log("\nOnaeri Tradfri v%s\n" % __version__)
 
 from Onaeri import Onaeri, settings
 import control
@@ -18,20 +20,19 @@ from time import sleep
 
 
 onaeri = Onaeri( settings, lampdata.now() )
-print("\n--------------------------------------------------\n")
+log("\n--------------------------------------------------\n")
 
 
 
-def heartbeat(position=True):
+def heartbeat(state=True):
     """
     Display network heartbeat
     """
-    if position:
-        print("\033[1;31m♥\033[0;0m", end="", flush=True)
+    if state:
+        print("\033[1;31m♥\033[0;0m\b", end="", flush=True)
         return
     else:
-        print("\b ", end="", flush=True)
-        print("\b", end="")
+        print(" \b", end="", flush=True)
         return
 
 
@@ -44,10 +45,10 @@ while True:
     onaeri.tick( lampData )
 
     if onaeri.update:
-        print("[%s] Update called:" % (onaeri.time.timeStamp))
+        log("[%s] Update called:" % (onaeri.time.timeStamp))
         for cycle in onaeri.cycles:
             if not cycle.lamp.isEmpty():
-                print('\t%s: %s' % (cycle.name, cycle.lamp))
+                log('\t%s: %s' % (cycle.name, cycle.lamp))
 
 
         heartbeat(True)
@@ -61,5 +62,5 @@ while True:
     try:
         sleep( settings.Global.mainLoopDelay )
     except KeyboardInterrupt:
-        print("\nKeyboard interrupt. Exiting.")
+        log("\nKeyboard interrupt. Exiting.")
         exit()

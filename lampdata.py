@@ -1,5 +1,5 @@
 from Onaeri.lamp import Lamp
-from Onaeri.helper import printWarning
+from Onaeri.logger import *
 from com import light_objects, api
 from pytradfri import error
 
@@ -15,7 +15,7 @@ def now():
         try:
             api(device.update())
         except error.RequestTimeout:
-            printWarning("\b×")
+            logWarn("\b×")
             return None
 
         light = device.light_control.lights[0]
