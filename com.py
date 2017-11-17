@@ -25,9 +25,9 @@ except error.RequestTimeout:
     logError("Do you want to reset the Gateway settings? (y/n)")
     inp = input()
     if inp == "y":
-        gateway_settings.resetSettings()
+        network.resetSettings()
+        helper.programRestart()
     exit()
-
 
 # Get list of all controllable lamps
 light_objects = [dev for dev in devices if dev.has_light_control]

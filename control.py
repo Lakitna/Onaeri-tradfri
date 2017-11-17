@@ -49,9 +49,6 @@ def brightness(api):
 
 
 
-
-
-
 def _sendCommand(command, iteration=1):
     """
     Send command with retry on timeout

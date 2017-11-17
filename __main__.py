@@ -19,9 +19,8 @@ import lampdata
 from time import sleep
 
 
-onaeri = Onaeri( settings, lampdata.now() )
+onaeri = Onaeri( lampdata.now() )
 log("\n--------------------------------------------------\n")
-
 
 
 def heartbeat(state=True):
@@ -35,32 +34,30 @@ def heartbeat(state=True):
         print(" \b", end="", flush=True)
         return
 
-
 while True:
-    heartbeat(True)
-    lampData = lampdata.now()
-    heartbeat(False)
-
-    # Progress all cycles and pass the current state of all lamps
-    onaeri.tick( lampData )
-
-    if onaeri.update:
-        log("[%s] Update called:" % (onaeri.time.timeStamp))
-        for cycle in onaeri.cycles:
-            if not cycle.lamp.isEmpty():
-                log('\t%s: %s' % (cycle.name, cycle.lamp))
-
-
+    try:
         heartbeat(True)
-        control.color( onaeri )
-        control.brightness( onaeri )
-        control.power( onaeri )
+        lampData = lampdata.now()
         heartbeat(False)
 
+        # Progress all cycles and pass the current state of all lamps
+        onaeri.tick( lampData )
 
-    # Slow down a bit, no stress brah
-    try:
+        if onaeri.update:
+            log("[%s]:" % (onaeri.time.timeStamp))
+            for cycle in onaeri.cycles:
+                if not cycle.lamp.isEmpty():
+                    log('\t%s: %s' % (cycle.name, cycle.lamp))
+
+            heartbeat(True)
+            control.color( onaeri )
+            control.brightness( onaeri )
+            control.power( onaeri )
+            heartbeat(False)
+
+        # Slow down a bit, no stress brah
         sleep( settings.Global.mainLoopDelay )
     except KeyboardInterrupt:
-        log("\nKeyboard interrupt. Exiting.")
+        log()
+        log("Keyboard interrupt. Exiting.")
         exit()

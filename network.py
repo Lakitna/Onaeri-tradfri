@@ -10,6 +10,7 @@ from pytradfri.api.libcoap_api import APIFactory
 class Network:
     def __init__(self):
         log("Establishing connection with the Gateway: ", end="", flush=True)
+
         self.filePath = "%s/gateway_settings.txt" % path.dirname(path.abspath(__file__))
         self._comVars = ['ip', 'psk', 'mac']
         self._separator = "="
@@ -18,11 +19,10 @@ class Network:
         self.ip = None
         self.psk = None
 
-
         if not self._settings['ip'] or not self.ipActive( self._settings['ip'] ):
             logWarn("No valid IP found in storage.", end=" ", flush=True)
             self._settings['ip'] = self.findGatewayIp()
-            self.updateSettings( self._settings )
+            self.storeSettings( self._settings )
 
         if not len(self._settings['psk']) == 16:
             # Generate new key
@@ -37,13 +37,11 @@ class Network:
                 api_factory = APIFactory(self._settings['ip'])
                 self._settings['psk'] = api_factory.generate_psk(key)
                 log('Generated PSK: ', self._settings['psk'])
-                self.updateSettings(self._settings)
+                self.storeSettings(self._settings)
 
-
-        # Make easily available after import
+        # Make variables easily accessible in other modules
         self.psk = self._settings['psk']
         self.ip = self._settings['ip']
-
 
 
     def resetSettings(self):
@@ -53,6 +51,7 @@ class Network:
         with open(self.filePath, 'w') as f:
             for var in self._comVars:
                 f.write("%s%s\n" % (var, self._separator))
+
 
     def getSettings(self):
         """
@@ -76,7 +75,7 @@ class Network:
         return ret
 
 
-    def updateSettings(self, values):
+    def storeSettings(self, values):
         """
         Update settings file. Input is dict
         """
@@ -87,7 +86,6 @@ class Network:
                     exit()
 
                 f.write("%s%s%s\n" % (key, self._separator, values[key]))
-
 
 
     def ipActive(self, ip):
@@ -134,7 +132,7 @@ class Network:
             (arpRecord, err) = proc.communicate()
             arpRecord = str(arpRecord)
 
-            # If there is more than one arp record returned
+            # If there is more than 1 arp record returned
             if len(arpRecord.split("\\n")) > 2:
                 return None
 
