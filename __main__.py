@@ -12,6 +12,7 @@ from Onaeri.logger import *
 
 log("Onaeri Tradfri v%s\n" % __version__)
 
+import sys, os
 from Onaeri import Onaeri, settings
 import control
 import com
@@ -21,6 +22,49 @@ from time import sleep
 
 onaeri = Onaeri( lampdata.now() )
 log("\n--------------------------------------------------\n")
+
+
+updateCounter = 0
+
+def summaryBuild():
+    version = {}
+    import Onaeri
+    version['Onaeri API'] = Onaeri.__version__
+    version['Onaeri Tradfri'] = __version__
+
+    time = {}
+    time['timecodes'] = onaeri.time.runtime
+    time['minutes'] = round(onaeri.time.runtime * settings.Global.minPerTimeCode, 2)
+    time['hours'] = round((onaeri.time.runtime * settings.Global.minPerTimeCode) / 60, 2)
+
+    observer = lampdata.count
+    observer["success rate"] = round((observer['success'] / observer['total']) * 100, 2)
+
+    ctrl = control.count
+    ctrl['success rate'] = round(((ctrl['total']-ctrl['timeouts']) / ctrl['total']) * 100, 2)
+
+    summary({
+            'Versions': version,
+            'Program runtime': time,
+            'Observer calls': observer,
+            'Lamp changes made': ctrl,
+            'Updates handled': updateCounter,
+            'Cycles handled': [cycle.name for cycle in onaeri.cycles],
+        })
+
+import atexit
+atexit.register(summaryBuild)
+
+
+restartTime = onaeri.time.makeCode((16,42), dry=True)
+def restart():
+    """
+    Restart entire program if the time is right
+    """
+    if onaeri.time.timeCode == restartTime and onaeri.time.runtime > 0:
+        summaryBuild()
+        os.execl(sys.executable, sys.executable, *sys.argv)
+
 
 
 def heartbeat(state=True):
@@ -44,6 +88,7 @@ while True:
         onaeri.tick( lampData )
 
         if onaeri.update:
+            updateCounter += 1
             log("[%s]:" % (onaeri.time.timeStamp))
             for cycle in onaeri.cycles:
                 if not cycle.lamp.isEmpty():
@@ -54,6 +99,8 @@ while True:
             control.brightness( onaeri )
             control.power( onaeri )
             heartbeat(False)
+
+        restart()
 
         # Slow down a bit, no stress brah
         sleep( settings.Global.mainLoopDelay )

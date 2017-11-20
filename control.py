@@ -8,6 +8,7 @@ from Onaeri import data, helper
 from Onaeri.logger import *
 from lampdata import briRange, colorRange
 
+count = {'total': 0, 'color': 0, 'power': 0, 'brightness': 0, 'timeouts': 0}
 
 def power(api):
     """
@@ -19,6 +20,7 @@ def power(api):
             for l in _selectLights(cycle.group, stateChange=True):
                 command = l.light_control.set_state(cycle.lamp.power)
                 _sendCommand(command)
+                count['power'] += 1
             continue
 
 
@@ -33,6 +35,7 @@ def color(api):
                 val = helper.scale(cycle.lamp.color, settings.Global.valRange, colorRange)
                 command = l.light_control.set_color_temp(val)
                 _sendCommand(command)
+                count['color'] += 1
             continue
 
 
@@ -47,6 +50,7 @@ def brightness(api):
                 val = helper.scale(cycle.lamp.brightness, settings.Global.valRange, briRange)
                 command = l.light_control.set_dimmer(val, transition_time=settings.Global.transitionTime*10)
                 _sendCommand(command)
+                count['brightness'] += 1
             continue
 
 
@@ -58,8 +62,10 @@ def _sendCommand(command, iteration=1):
     """
     try:
         com.api(command)
+        count['total'] += 1
     except error.RequestTimeout:
         logWarn("[Control] Timeout error on try %d" % iteration)
+        count['timeout'] += 1
         if iteration < settings.Global.commandsTries:
             _sendCommand(command, iteration=iteration+1)
 
