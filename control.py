@@ -8,7 +8,7 @@ from Onaeri import data, helper
 from Onaeri.logger import *
 from lampdata import briRange, colorRange
 
-count = {'total': 0, 'color': 0, 'power': 0, 'brightness': 0, 'timeouts': 0}
+count = {'total': 0, 'color': 0, 'power': 0, 'brightness': 0, 'timeout': 0}
 
 def power(api):
     """
