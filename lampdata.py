@@ -1,7 +1,13 @@
 from Onaeri.lamp import Lamp
 from Onaeri.logger import *
+from Onaeri import helper
+from Onaeri.settings.Global import valRange
 from com import light_objects, api
 from pytradfri import error
+
+
+briRange         = (1, 254)   # [min, max] brightness. Unsigned int
+colorRange       = (454, 250) # [min, max] color temp. Unsigned int
 
 
 def now():
@@ -24,5 +30,10 @@ def now():
         power = False
         if device.reachable:  power = light.state
 
-        ret.append( Lamp(light.dimmer, light.kelvin_color_inferred, power, name=lamp.name) )
+        ret.append( Lamp(
+                helper.scale(light.dimmer,     briRange,   valRange),
+                helper.scale(light.color_temp, colorRange, valRange),
+                power,
+                name=lamp.name)
+            )
     return ret

@@ -4,8 +4,9 @@ import time
 from pytradfri import error
 import com
 import Onaeri.settings as settings
-from Onaeri import data
+from Onaeri import data, helper
 from Onaeri.logger import *
+from lampdata import briRange, colorRange
 
 
 def power(api):
@@ -29,7 +30,8 @@ def color(api):
         if cycle.update and not cycle.lamp.color == None:
 
             for l in _selectLights(cycle.group):
-                command = l.light_control.set_kelvin_color(cycle.lamp.color)
+                val = helper.scale(cycle.lamp.color, settings.Global.valRange, colorRange)
+                command = l.light_control.set_color_temp(val)
                 _sendCommand(command)
             continue
 
@@ -42,7 +44,8 @@ def brightness(api):
         if cycle.update and not cycle.lamp.brightness == None:
 
             for l in _selectLights(cycle.group):
-                command = l.light_control.set_dimmer(cycle.lamp.brightness, transition_time=settings.Global.transitionTime*10)
+                val = helper.scale(cycle.lamp.brightness, settings.Global.valRange, briRange)
+                command = l.light_control.set_dimmer(val, transition_time=settings.Global.transitionTime*10)
                 _sendCommand(command)
             continue
 
