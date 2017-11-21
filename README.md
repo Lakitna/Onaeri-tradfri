@@ -30,7 +30,7 @@ Or just run the following command and let the computer do all the hard work:
 ### 2. Run installer
 Locate the file `setup_linux.sh` or `setup_macos.sh` and execute them. Unfortunately there is no Windows installer yet.
 
-Run the correct settings file and watch the magic happen. The setup will install all dependencies for you, this will take a while.
+Run the correct setup file and watch the magic happen. The setup will install all dependencies for you, this will take a while.
 
 
 ### 3. Change settings
