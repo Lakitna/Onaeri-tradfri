@@ -56,7 +56,7 @@ import atexit
 atexit.register(summaryBuild)
 
 
-restartTime = onaeri.time.makeCode((16,42), dry=True)
+restartTime = onaeri.time.makeCode((3,0), dry=True)
 def restart():
     """
     Restart entire program if the time is right
@@ -64,7 +64,6 @@ def restart():
     if onaeri.time.timeCode == restartTime and onaeri.time.runtime > 0:
         summaryBuild()
         os.execl(sys.executable, sys.executable, *sys.argv)
-
 
 
 def heartbeat(state=True):
@@ -77,6 +76,7 @@ def heartbeat(state=True):
     else:
         print(" \b", end="", flush=True)
         return
+
 
 while True:
     try:
