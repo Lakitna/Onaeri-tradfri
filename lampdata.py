@@ -16,9 +16,7 @@ def now():
     """
     count['total'] += 1
     ret = []
-    for lamp in light_objects:
-        device = lamp
-
+    for device in light_objects:
         try:
             api(device.update())
         except error.RequestTimeout:
@@ -35,8 +33,8 @@ def now():
                 helper.scale(light.dimmer,     briRange,   valRange),
                 helper.scale(light.color_temp, colorRange, valRange),
                 power,
-                name=lamp.name)
+                name=device.name)
             )
-            
+
     count['success'] += 1
     return ret

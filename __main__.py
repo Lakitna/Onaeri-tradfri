@@ -3,7 +3,7 @@ Tradfri wrapper for Onaeri API
 https://github.com/Lakitna/Onaeri-tradfri
 """
 
-__version__ = '0.6.0'
+__version__ = '0.6.1'
 
 
 print("\n" * 100)
@@ -41,7 +41,7 @@ def summaryBuild():
     observer["success rate"] = round((observer['success'] / observer['total']) * 100, 2)
 
     ctrl = control.count
-    ctrl['success rate'] = round(((ctrl['total']-ctrl['timeouts']) / ctrl['total']) * 100, 2)
+    ctrl['success rate'] = round(((ctrl['total']-ctrl['timeout']) / ctrl['total']) * 100, 2)
 
     summary({
             'Versions': version,
