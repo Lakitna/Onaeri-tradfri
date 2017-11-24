@@ -23,6 +23,16 @@ def power(api):
                 count['power'] += 1
             continue
 
+        if cycle.lamp.mode == "dark" and len(cycle.group) > 1:
+            c = 0
+            for l in _selectLights(cycle.group):
+                if c % 2:
+                    command = l.light_control.set_state(False)
+                    _sendCommand(command)
+                    count['power'] += 1
+                c += 1
+            continue
+
 
 def color(api):
     """
