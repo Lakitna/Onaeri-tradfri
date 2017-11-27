@@ -33,7 +33,7 @@ def color(api):
 
             for l in _selectLights(cycle.group):
                 val = helper.scale(cycle.lamp.color, settings.Global.valRange, colorRange)
-                command = l.light_control.set_color_temp(val)
+                command = l.light_control.set_color_temp(val, transition_time=settings.Global.transitionTime*10)
                 _sendCommand(command)
                 count['color'] += 1
             continue
