@@ -1,47 +1,58 @@
 from os import path
+import uuid
 import socket
 import subprocess
 import re
 from Onaeri import helper
 from Onaeri.logger import *
 from pytradfri.api.libcoap_api import APIFactory
+from pytradfri import error
 
 
 class Network:
     def __init__(self):
-        log("Establishing connection with the Gateway: ", end="", flush=True)
+        log("Connecting with Gateway: ", end="", flush=True)
 
-        self.filePath = "%s/gateway_settings.txt" % path.dirname(path.abspath(__file__))
-        self._comVars = ['ip', 'psk', 'mac']
+        self.filePath = "%s/gateway.conf" % path.dirname(path.abspath(__file__))
+        self._settingVars = ['ip', 'psk', 'identity', 'mac']
         self._separator = "="
         self._settings = self.getSettings()
 
-        self.ip = None
-        self.psk = None
 
         if not self._settings['ip'] or not self.ipActive( self._settings['ip'] ):
-            logWarn("No valid IP found in storage.", end=" ", flush=True)
+            logWarn("No valid IP found in storage.")
             self._settings['ip'] = self.findGatewayIp()
             self.storeSettings( self._settings )
 
+
         if not len(self._settings['psk']) == 16:
-            # Generate new key
             log()
             logWarn("No valid Security Code found in storage.")
+            logWarn("Gateway guard won't open the door.")
             logWarn("Please enter the Security Code on the back of your Gateway:", end=" ")
             key = input().strip()
             if len(key) < 2:
                 logError("No Security Code provided by user. Exiting.")
                 exit()
             else:
-                api_factory = APIFactory(self._settings['ip'])
-                self._settings['psk'] = api_factory.generate_psk(key)
-                log('Generated PSK: ', self._settings['psk'])
+                identity = uuid.uuid4().hex
+                api_factory = APIFactory(host=self._settings['ip'], psk_id=identity)
+
+                try:
+                    psk = api_factory.generate_psk(key)
+                except error.RequestTimeout:
+                    logError("Gateway guard doesn't respond to the Security Code, door remains locked.")
+                    logError("Please check if you made an error while entering the Security Code and try again.")
+                    exit()
+                logSuccess("Gateway guard opened the door.")
+
+                self._settings['identity'] = identity
+                self._settings['psk'] = psk
                 self.storeSettings(self._settings)
 
-        # Make variables easily accessible in other modules
-        self.psk = self._settings['psk']
-        self.ip = self._settings['ip']
+
+        # Make api_factory easily accessible in other modules
+        self.api_factory = APIFactory(host=self._settings['ip'], psk_id=self._settings['identity'], psk=self._settings['psk'])
 
 
     def resetSettings(self):
@@ -49,7 +60,7 @@ class Network:
         Reset/make Gateway settings file
         """
         with open(self.filePath, 'w') as f:
-            for var in self._comVars:
+            for var in self._settingVars:
                 f.write("%s%s\n" % (var, self._separator))
 
 
@@ -67,11 +78,17 @@ class Network:
                 key = line[0]
                 val = line[1]
 
-                if not key in self._comVars:
+                if not key in self._settingVars:
                     logError("Gateway settings invalid. Unexpected parameter '%s'." % key)
                     exit()
-
                 ret[key] = val
+
+            if not len(ret) == len(self._settingVars):
+                logError("Gateway settings invalid. Missing %d parameters." % (len(self._settingVars) - len(ret)))
+                logError("Clearing settings and retrying.")
+                self.resetSettings()
+                return self.getSettings()
+
         return ret
 
 
@@ -81,7 +98,7 @@ class Network:
         """
         with open(self.filePath, 'w') as f:
             for key in values:
-                if not key in self._comVars:
+                if not key in self._settingVars:
                     logError("Gateway setting invalid. Tried to write unexpected parameter '%s'." % key)
                     exit()
 
