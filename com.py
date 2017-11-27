@@ -24,7 +24,6 @@ except error.RequestTimeout:
     inp = input()
     if inp == "y":
         network.resetSettings()
-        helper.programRestart()
     exit()
 
 # Get list of all controllable lamps
