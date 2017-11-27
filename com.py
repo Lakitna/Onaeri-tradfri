@@ -8,9 +8,7 @@ from pytradfri.api.libcoap_api import APIFactory
 
 network = Network()
 
-api_factory = APIFactory(network.ip)
-api_factory.psk = network.psk
-
+api_factory = network.api_factory
 api = api_factory.request
 
 gateway = Gateway()
