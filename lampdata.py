@@ -20,7 +20,7 @@ def now():
         try:
             api(device.update())
         except error.RequestTimeout:
-            print("\b×")
+            print("×")
             count['timeout'] += 1
             return None
 

@@ -8,7 +8,7 @@ from Onaeri import data, helper
 from Onaeri.logger import *
 from lampdata import briRange, colorRange
 
-count = {'total': 0, 'color': 0, 'power': 0, 'brightness': 0, 'timeout': 0}
+metrics = {'total': 0, 'color': 0, 'power': 0, 'brightness': 0, 'timeout': 0}
 
 def power(api):
     """
@@ -16,22 +16,19 @@ def power(api):
     """
     for cycle in api.cycles:
         if cycle.update and not cycle.lamp.power == None:
-
-            for l in _selectLights(cycle.group, stateChange=True):
+            for l in _selectLights(cycle.name, stateChange=True):
                 command = l.light_control.set_state(cycle.lamp.power)
                 _sendCommand(command)
-                count['power'] += 1
-            continue
+                metrics['power'] += 1
 
-        if cycle.lamp.mode == "dark" and len(cycle.group) > 1:
-            c = 0
-            for l in _selectLights(cycle.group):
-                if c % 2:
-                    command = l.light_control.set_state(False)
-                    _sendCommand(command)
-                    count['power'] += 1
-                c += 1
-            continue
+        if cycle.lamp.mode == "dark":
+            lamps = _selectLights(cycle.name)
+            if len(lamps) > 1:
+                for i in range(len(lamps)):
+                    if i % 2:
+                        command = lamps[i].light_control.set_state(False)
+                        _sendCommand(command)
+                        metrics['power'] += 1
 
 
 def color(api):
@@ -40,13 +37,12 @@ def color(api):
     """
     for cycle in api.cycles:
         if cycle.update and not cycle.lamp.color == None:
+            val = helper.scale(cycle.lamp.color, settings.Global.valRange, colorRange)
 
-            for l in _selectLights(cycle.group):
-                val = helper.scale(cycle.lamp.color, settings.Global.valRange, colorRange)
+            for l in _selectLights(cycle.name):
                 command = l.light_control.set_color_temp(val, transition_time=settings.Global.transitionTime*10)
                 _sendCommand(command)
-                count['color'] += 1
-            continue
+                metrics['color'] += 1
 
 
 def brightness(api):
@@ -55,13 +51,12 @@ def brightness(api):
     """
     for cycle in api.cycles:
         if cycle.update and not cycle.lamp.brightness == None:
+            val = helper.scale(cycle.lamp.brightness, settings.Global.valRange, briRange)
 
-            for l in _selectLights(cycle.group):
-                val = helper.scale(cycle.lamp.brightness, settings.Global.valRange, briRange)
+            for l in _selectLights(cycle.name):
                 command = l.light_control.set_dimmer(val, transition_time=settings.Global.transitionTime*10)
                 _sendCommand(command)
-                count['brightness'] += 1
-            continue
+                metrics['brightness'] += 1
 
 
 
@@ -72,32 +67,19 @@ def _sendCommand(command, iteration=1):
     """
     try:
         com.api(command)
-        count['total'] += 1
+        metrics['total'] += 1
     except error.RequestTimeout:
         logWarn("[Control] Timeout error on try %d" % iteration)
-        count['timeout'] += 1
+        metrics['timeout'] += 1
         if iteration < settings.Global.commandsTries:
             _sendCommand(command, iteration=iteration+1)
 
 
-def _selectLights(lightIndex, *, stateChange=False):
+def _selectLights(cycle, *, stateChange=False):
     """
     Select lamps
     """
-    if lightIndex == None:
-        lightIndex = []
-        for i in range(len(com.light_objects)):
-            lightIndex.append(i)
-    if type(lightIndex) is int:
-        lightIndex = [lightIndex]
-
-
-    ret = []
-    for i in lightIndex:
-        try:
-            if com.light_objects[i].light_control.lights[0].state or stateChange:
-                ret.append(com.light_objects[i])
-        except IndexError:
-            log
-            Error("[Control] Selected lamp #%d is unkown" % i)
-    return ret
+    try:
+        return com.light_groups[cycle]
+    except KeyError:
+        logError("No lamps available for cycle `%s`." % cycle)
