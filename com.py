@@ -29,11 +29,9 @@ except error.RequestTimeout:
 # Get list of all controllable lamps
 light_objects = [dev for dev in devices if dev.has_light_control]
 
-# Rearrange list of controllable lamps based on lamp name
-light_groups = {}
-for group in settings.cycles:
-    light_groups[group] = [l for l in light_objects if group.lower() in l.name.lower()]
-    if len(light_groups[group]) == 0:
-        logError("No lamps found with partial name `%s`. Please use the official Ikea app to rename lamps." % group)
+# Key list of controllable lamps with their lamp name
+light_ids = {}
+for l in light_objects:
+    light_ids[l.name] = l
 
 logSuccess("Done", end="\n\n")

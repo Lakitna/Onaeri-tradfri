@@ -41,7 +41,11 @@ def summaryBuild():
     observer["success rate"] = round((observer['success'] / observer['total']) * 100, 2)
 
     ctrl = control.metrics
-    ctrl['success rate'] = round(((ctrl['total']-ctrl['timeout']) / ctrl['total']) * 100, 2)
+    try:
+        ctrl['success rate'] = round(((ctrl['total']-ctrl['timeout']) / ctrl['total']) * 100, 2)
+    except ZeroDivisionError:
+        ctrl['success rate'] = None
+
 
     summary({
             'Versions': version,
@@ -91,8 +95,9 @@ while True:
             updateCounter += 1
             log("[%s]:" % (onaeri.time.timeStamp))
             for cycle in onaeri.cycles:
-                if not cycle.lamp.isEmpty(['brightness', 'color', 'power']):
-                    log('\t%s: %s' % (cycle.name, cycle.lamp))
+                for id in cycle.lamp:
+                    if not cycle.lamp[id].isEmpty(['brightness', 'color', 'power']):
+                        log('\t%s: %s' % (cycle.name, cycle.lamp[id]))
 
             heartbeat(True)
             control.color( onaeri )
