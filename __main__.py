@@ -27,6 +27,16 @@ log("\n--------------------------------------------------\n")
 updateCounter = 0
 
 def summaryBuild():
+    def colorSuccessRate(val):
+        if val < 90:
+            return "\033[7;31m %s \033[0;0m" % val
+        if val < 95:
+            return "\033[1;34m %s \033[0;0m" % val
+        if val > 98:
+            return "\033[7;32m %s \033[0;0m" % val
+        return val
+
+
     version = {}
     import Onaeri
     version['Onaeri API'] = Onaeri.__version__
@@ -37,12 +47,14 @@ def summaryBuild():
     time['minutes'] = round(onaeri.time.runtime * settings.Global.minPerTimeCode, 2)
     time['hours'] = round((onaeri.time.runtime * settings.Global.minPerTimeCode) / 60, 2)
 
-    observer = lampdata.count
+    observer = lampdata.metrics
     observer["success rate"] = round((observer['success'] / observer['total']) * 100, 2)
+    observer['success rate'] = colorSuccessRate(observer['success rate'])
 
     ctrl = control.metrics
     try:
         ctrl['success rate'] = round(((ctrl['total']-ctrl['timeout']) / ctrl['total']) * 100, 2)
+        ctrl['success rate'] = colorSuccessRate(ctrl['success rate'])
     except ZeroDivisionError:
         ctrl['success rate'] = None
 
