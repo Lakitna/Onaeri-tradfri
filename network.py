@@ -11,7 +11,7 @@ from pytradfri import error
 
 class Network:
     def __init__(self):
-        log("Connecting with Gateway: ", end="", flush=True)
+        log("Connecting to Gateway: ", end="", flush=True)
 
         self.filePath = "%s/gateway.conf" % path.dirname(path.abspath(__file__))
         self._settingVars = ['ip', 'psk', 'identity', 'mac']
