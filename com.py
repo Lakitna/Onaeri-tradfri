@@ -29,4 +29,12 @@ except error.RequestTimeout:
 # Get list of all controllable lamps
 light_objects = [dev for dev in devices if dev.has_light_control]
 
+# Key list of controllable lamps with their lamp name
+light_ids = {}
+for l in light_objects:
+    if l.name in light_ids:
+        logError("Two lamps have the exact same name. Please make all lamp names unique and try again.")
+        exit()
+    light_ids[l.name] = l
+
 logSuccess("Done", end="\n\n")
