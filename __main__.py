@@ -12,12 +12,12 @@ from Onaeri.logger import *
 
 log("Onaeri Tradfri v%s\n" % __version__)
 
-import sys, os
+import sys, os, traceback
 from Onaeri import Onaeri, settings
 import control
 import com
 import lampdata
-from time import sleep
+from time import sleep, strftime
 
 
 onaeri = Onaeri( lampdata.now() )
@@ -105,11 +105,13 @@ while True:
 
         if onaeri.update:
             updateCounter += 1
-            log("[%s]:" % (onaeri.time.timeStamp))
+            print("[%s]:" % (strftime("%H:%M:%S")))
+
             for cycle in onaeri.cycles:
                 for id in cycle.lamp:
                     if not cycle.lamp[id].isEmpty(['brightness', 'color', 'power']):
-                        log('\t%s: %s' % (cycle.name, cycle.lamp[id]))
+                        l = cycle.lamp[id]
+                        print("\t%s: %s" % (cycle.name, l))
 
             heartbeat(True)
             control.color( onaeri )
@@ -124,4 +126,9 @@ while True:
     except KeyboardInterrupt:
         log()
         log("Keyboard interrupt. Exiting.")
+        exit()
+    except Exception:
+        log()
+        log("An error occurred:")
+        log(traceback.format_exc())
         exit()

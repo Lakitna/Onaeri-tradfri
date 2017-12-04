@@ -4,7 +4,6 @@ from Onaeri import helper
 from Onaeri.logger import *
 
 from pytradfri import Gateway, error
-from pytradfri.api.libcoap_api import APIFactory
 
 network = Network()
 

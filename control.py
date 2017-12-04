@@ -24,6 +24,7 @@ def power(api):
                     command = lamp.light_control.set_state(cycle.lamp[id].power)
                     _sendCommand(command)
                     metrics['power'] += 1
+    time.sleep(settings.Global.transitionTime)
 
 
 def color(api):
@@ -40,6 +41,7 @@ def color(api):
                     command = lamp.light_control.set_color_temp(val, transition_time=settings.Global.transitionTime*10)
                     _sendCommand(command)
                     metrics['color'] += 1
+    time.sleep(settings.Global.transitionTime)
 
 
 def brightness(api):
@@ -56,6 +58,7 @@ def brightness(api):
                     command = lamp.light_control.set_dimmer(val, transition_time=settings.Global.transitionTime*10)
                     _sendCommand(command)
                     metrics['brightness'] += 1
+    time.sleep(settings.Global.transitionTime)
 
 
 
@@ -66,7 +69,6 @@ def _sendCommand(command, iteration=1):
     try:
         com.api(command)
         metrics['total'] += 1
-        time.sleep(settings.Global.transitionTime / 2)
     except error.RequestTimeout:
         logWarn("[Control] Timeout error on try %d" % iteration)
         metrics['timeout'] += 1

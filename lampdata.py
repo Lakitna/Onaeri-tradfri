@@ -18,7 +18,9 @@ def now():
     ret = []
     for device in light_objects:
         try:
-            api(device.update())
+            command = device.update()
+            command._timeout = 3
+            api(command)
         except error.RequestTimeout:
             print("×")
             metrics['timeout'] += 1
