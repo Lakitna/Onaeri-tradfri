@@ -21,19 +21,24 @@ from time import sleep, strftime
 
 
 onaeri = Onaeri( lampdata.now() )
-log("\n--------------------------------------------------\n")
-
+log()
+log.row()
+log()
 
 updateCounter = 0
 
 def summaryBuild():
     def colorSuccessRate(val):
+        if val < 80:
+            return "%s #superLow" % val
         if val < 90:
-            return "\033[7;31m %s \033[0;0m" % val
+            return "%s #low" % val
         if val < 95:
-            return "\033[1;34m %s \033[0;0m" % val
+            return "%s #ok" % val
         if val > 98:
-            return "\033[7;32m %s \033[0;0m" % val
+            return "%s #awesome" % val
+        if val >= 95:
+            return "%s #good" % val
         return val
 
 
@@ -59,7 +64,7 @@ def summaryBuild():
         ctrl['success rate'] = None
 
 
-    summary({
+    log.summary({
             'Versions': version,
             'Program runtime': time,
             'Observer calls': observer,

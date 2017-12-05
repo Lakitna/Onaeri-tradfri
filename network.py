@@ -1,4 +1,4 @@
-from os import path
+import os
 import uuid
 import socket
 import subprocess
@@ -13,26 +13,26 @@ class Network:
     def __init__(self):
         log("Connecting to Gateway: ", end="", flush=True)
 
-        self.filePath = "%s/gateway.conf" % path.dirname(path.abspath(__file__))
+        self.filePath = "%s/gateway.conf" % os.path.dirname(os.path.abspath(__file__))
         self._settingVars = ['ip', 'psk', 'identity', 'mac']
         self._separator = "="
         self._settings = self.getSettings()
 
 
         if not self._settings['ip'] or not self.ipActive( self._settings['ip'] ):
-            logWarn("No valid IP found in storage.")
+            log.warn("No valid IP found in storage.")
             self._settings['ip'] = self.findGatewayIp()
             self.storeSettings( self._settings )
 
 
         if not len(self._settings['psk']) == 16:
             log()
-            logWarn("No valid Security Code found in storage.")
-            logWarn("Gateway guard won't open the door.")
-            logWarn("Please enter the Security Code on the back of your Gateway:", end=" ")
+            log.warn("No valid Security Code found in storage.")
+            log.warn("Gateway guard won't open the door.")
+            log.warn("Please enter the Security Code on the back of your Gateway:", end=" ")
             key = input().strip()
             if len(key) < 2:
-                logError("No Security Code provided by user. Exiting.")
+                log.error("No Security Code provided by user. Exiting.")
                 exit()
             else:
                 identity = uuid.uuid4().hex
@@ -41,10 +41,10 @@ class Network:
                 try:
                     psk = api_factory.generate_psk(key)
                 except error.RequestTimeout:
-                    logError("Gateway guard doesn't respond to the Security Code, door remains locked.")
-                    logError("Please check if you made an error while entering the Security Code and try again.")
+                    log.error("Gateway guard doesn't respond to the Security Code, door remains locked.")
+                    log.error("Please check if you made an error while entering the Security Code and try again.")
                     exit()
-                logSuccess("Gateway guard opened the door.")
+                log.success("Gateway guard opened the door.")
 
                 self._settings['identity'] = identity
                 self._settings['psk'] = psk
@@ -68,7 +68,7 @@ class Network:
         """
         Grab settings from settings file, validate file integrety and output as dict
         """
-        if not path.isfile(self.filePath) or not path.getsize(self.filePath) > 0:
+        if not os.path.isfile(self.filePath) or not os.path.getsize(self.filePath) > 0:
             self.resetSettings()
 
         with open(self.filePath, 'r+') as f:
@@ -79,13 +79,13 @@ class Network:
                 val = line[1]
 
                 if not key in self._settingVars:
-                    logError("Gateway settings invalid. Unexpected parameter '%s'." % key)
+                    log.error("Gateway settings invalid. Unexpected parameter '%s'." % key)
                     exit()
                 ret[key] = val
 
             if not len(ret) == len(self._settingVars):
-                logError("Gateway settings invalid. Missing %d parameters." % (len(self._settingVars) - len(ret)))
-                logError("Clearing settings and retrying.")
+                log.error("Gateway settings invalid. Missing %d parameters." % (len(self._settingVars) - len(ret)))
+                log.error("Clearing settings and retrying.")
                 self.resetSettings()
                 return self.getSettings()
 
@@ -99,7 +99,7 @@ class Network:
         with open(self.filePath, 'w') as f:
             for key in values:
                 if not key in self._settingVars:
-                    logError("Gateway setting invalid. Tried to write unexpected parameter '%s'." % key)
+                    log.error("Gateway setting invalid. Tried to write unexpected parameter '%s'." % key)
                     exit()
 
                 f.write("%s%s%s\n" % (key, self._separator, values[key]))
@@ -134,7 +134,7 @@ class Network:
                 s.close()
             except OSError:
                 log()
-                logError("Couldn't find the IP of this machine. Are you connected to the network?")
+                log.error("Couldn't find the IP of this machine. Are you connected to the network?")
                 exit()
 
             # Ping entire subnet
@@ -162,7 +162,7 @@ class Network:
             return arpRecord[match.start():match.end()]
 
 
-        logWarn("Looking for Gateway on local network.", end=" ", flush=True)
+        log.warn("Looking for Gateway on local network.", end=" ", flush=True)
 
         if not iteration:
             updateAPR()
@@ -173,8 +173,8 @@ class Network:
         if ip is None:
             if len(self._settings['mac']) < 2: # If mac address is unkown
                 log()
-                logError("Couldn't find gateway by its name.")
-                logError("Please enter the Serial Number on the back of the device:", end=" ")
+                log.error("Couldn't find gateway by its name.")
+                log.error("Please enter the Serial Number on the back of the device:", end=" ")
                 mac = input().replace("-", ":")
                 if len(mac) < 2:
                     exit()
@@ -183,16 +183,16 @@ class Network:
 
         if ip is None:
             if not iteration:
-                logError("Couldn't find any gateway by name or Serial Number. Values have been reset, trying again with a blank slate.")
+                log.error("Couldn't find any gateway by name or Serial Number. Values have been reset, trying again with a blank slate.")
                 self._settings['mac'] = ''
                 ip = self.findGatewayIp(True)
             else:
-                logError("Couldn't find any gateway by name or Serial Number.")
-                logError("Are you sure the gateway is on?")
-                logError("Are you connected to the correct network?")
+                log.error("Couldn't find any gateway by name or Serial Number.")
+                log.error("Are you sure the gateway is on?")
+                log.error("Are you connected to the correct network?")
                 exit()
 
         if not ip is None:
             if not iteration:
-                logSuccess("IP found", end=" ")
+                log.success("IP found", end=" ")
             return ip
