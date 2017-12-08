@@ -1,5 +1,4 @@
 from Onaeri.lamp import Lamp
-from Onaeri.logger import log
 from Onaeri import helper
 from Onaeri.settings.Global import valRange
 from com import light_objects, api
