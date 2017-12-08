@@ -12,7 +12,10 @@ from Onaeri.logger import *
 
 log("Onaeri Tradfri v%s\n" % __version__)
 
-import sys, os, traceback
+import sys
+import os
+import traceback
+import atexit
 from Onaeri import Onaeri, settings
 import control
 import com
@@ -20,12 +23,14 @@ import lampdata
 from time import sleep, strftime
 
 
-onaeri = Onaeri( lampdata.now() )
+onaeri = Onaeri(lampdata.now())
 log()
 log.row()
 log()
 
+restartTime = onaeri.time.code((3, 0), dry=True)
 updateCounter = 0
+
 
 def summaryBuild():
     def colorSuccessRate(val):
@@ -41,7 +46,6 @@ def summaryBuild():
             return "%s #good" % val
         return val
 
-
     version = {}
     import Onaeri
     version['Onaeri API'] = Onaeri.__version__
@@ -49,35 +53,37 @@ def summaryBuild():
 
     time = {}
     time['timecodes'] = onaeri.time.runtime
-    time['minutes'] = round(onaeri.time.runtime * settings.Global.minPerTimeCode, 2)
-    time['hours'] = round((onaeri.time.runtime * settings.Global.minPerTimeCode) / 60, 2)
+    time['minutes'] = round(onaeri.time.runtime
+                            * settings.Global.minPerTimeCode, 2)
+    time['hours'] = round((onaeri.time.runtime
+                          * settings.Global.minPerTimeCode) / 60, 2)
 
     observer = lampdata.metrics
-    observer["success rate"] = round((observer['success'] / observer['total']) * 100, 2)
+    observer["success rate"] = round((observer['success']
+                                     / observer['total']) * 100, 2)
     observer['success rate'] = colorSuccessRate(observer['success rate'])
 
     ctrl = control.metrics
     try:
-        ctrl['success rate'] = round(((ctrl['total']-ctrl['timeout']) / ctrl['total']) * 100, 2)
+        ctrl['success rate'] = round(((ctrl['total'] - ctrl['timeout'])
+                                     / ctrl['total']) * 100, 2)
         ctrl['success rate'] = colorSuccessRate(ctrl['success rate'])
     except ZeroDivisionError:
         ctrl['success rate'] = None
 
-
     log.summary({
-            'Versions': version,
-            'Program runtime': time,
-            'Observer calls': observer,
-            'Lamp changes made': ctrl,
-            'Updates handled': updateCounter,
-            'Cycles handled': [cycle.name for cycle in onaeri.cycles],
-        })
+        'Versions': version,
+        'Program runtime': time,
+        'Observer calls': observer,
+        'Lamp changes made': ctrl,
+        'Updates handled': updateCounter,
+        'Cycles handled': [cycle.name for cycle in onaeri.cycles],
+    })
 
-import atexit
+
 atexit.register(summaryBuild)
 
 
-restartTime = onaeri.time.makeCode((3,0), dry=True)
 def restart():
     """
     Restart entire program if the time is right
@@ -106,7 +112,7 @@ while True:
         heartbeat(False)
 
         # Progress all cycles and pass the current state of all lamps
-        onaeri.tick( lampData )
+        onaeri.tick(lampData)
 
         if onaeri.update:
             updateCounter += 1
@@ -114,20 +120,21 @@ while True:
 
             for cycle in onaeri.cycles:
                 for id in cycle.lamp:
-                    if not cycle.lamp[id].isEmpty(['brightness', 'color', 'power']):
-                        l = cycle.lamp[id]
-                        print("\t%s: %s" % (cycle.name, l))
+                    if not cycle.lamp[id].isEmpty(['brightness',
+                                                   'color',
+                                                   'power']):
+                        print("\t%s: %s" % (cycle.name, cycle.lamp[id]))
 
             heartbeat(True)
-            control.color( onaeri )
-            control.brightness( onaeri )
-            control.power( onaeri )
+            control.color(onaeri)
+            control.brightness(onaeri)
+            control.power(onaeri)
             heartbeat(False)
 
         restart()
 
         # Slow down a bit, no stress brah
-        sleep( settings.Global.mainLoopDelay )
+        sleep(settings.Global.mainLoopDelay)
     except KeyboardInterrupt:
         log()
         log("Keyboard interrupt. Exiting.")

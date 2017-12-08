@@ -6,9 +6,10 @@ from com import light_objects, api
 from pytradfri import error
 
 
-briRange         = (1, 254)   # [min, max] brightness. Unsigned int
-colorRange       = (454, 250) # [min, max] color temp. Unsigned int
+briRange = (1, 254)  # [min, max] brightness. Unsigned int
+colorRange = (454, 250)  # [min, max] color temp. Unsigned int
 metrics = {'total': 0, 'success': 0, 'timeout': 0}
+
 
 def now():
     """
@@ -29,14 +30,15 @@ def now():
         light = device.light_control.lights[0]
 
         power = False
-        if device.reachable:  power = light.state
+        if device.reachable:
+            power = light.state
 
-        ret.append( Lamp(
-                helper.scale(light.dimmer,     briRange,   valRange),
-                helper.scale(light.color_temp, colorRange, valRange),
-                power,
-                name=device.name)
-            )
+        ret.append(Lamp(
+                   helper.scale(light.dimmer, briRange, valRange),
+                   helper.scale(light.color_temp, colorRange, valRange),
+                   power,
+                   name=device.name)
+                   )
 
     metrics['success'] += 1
     return ret
