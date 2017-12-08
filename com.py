@@ -1,7 +1,7 @@
 from network import Network
 import Onaeri.settings as settings
 from Onaeri import helper
-from Onaeri.logger import *
+from Onaeri.logger import log
 
 from pytradfri import Gateway, error
 

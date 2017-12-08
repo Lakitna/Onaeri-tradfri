@@ -4,7 +4,7 @@ import socket
 import subprocess
 import re
 from Onaeri import helper
-from Onaeri.logger import *
+from Onaeri.logger import log
 from pytradfri.api.libcoap_api import APIFactory
 from pytradfri import error
 

@@ -8,7 +8,7 @@ __version__ = '0.8.0'
 
 print("\n" * 100)
 
-from Onaeri.logger import *
+from Onaeri.logger import log
 
 log("Onaeri Tradfri v%s\n" % __version__)
 

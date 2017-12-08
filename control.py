@@ -5,7 +5,7 @@ from pytradfri import error
 import com
 import Onaeri.settings as settings
 from Onaeri import data, helper
-from Onaeri.logger import *
+from Onaeri.logger import log
 from lampdata import briRange, colorRange
 
 metrics = {'total': 0, 'color': 0, 'power': 0, 'brightness': 0, 'timeout': 0}
