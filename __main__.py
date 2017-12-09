@@ -5,31 +5,27 @@ https://github.com/Lakitna/Onaeri-tradfri
 
 __version__ = '0.8.0'
 
-
-print("\n" * 100)
-
-from Onaeri.logger import log
-
-log("Onaeri Tradfri v%s\n" % __version__)
-
 import sys
 import os
 import traceback
 import atexit
-from Onaeri import Onaeri, settings
-import control
-import com
-import lampdata
 from time import sleep, strftime
-
+from Onaeri.logger import log
+from Onaeri import Onaeri, settings, __version__ as onaeriVersion
+import control
+import lampdata
 
 onaeri = Onaeri(lampdata.now())
-log()
-log.row()
-log()
-
 restartTime = onaeri.time.code((3, 0), dry=True)
 updateCounter = 0
+
+log()
+log.row()
+log("RUNTIME STARTED")
+log("Onaeri v%s" % (onaeriVersion))
+log("Onaeri Tradfri v%s" % __version__)
+log.row()
+log()
 
 
 def summaryBuild():
@@ -88,7 +84,7 @@ def restart():
     """
     Restart entire program if the time is right
     """
-    if onaeri.time.timeCode == restartTime and onaeri.time.runtime > 0:
+    if onaeri.time.latestCode == restartTime and onaeri.time.runtime > 0:
         summaryBuild()
         os.execl(sys.executable, sys.executable, *sys.argv)
 
