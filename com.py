@@ -1,10 +1,9 @@
 from network import Network
 import Onaeri.settings as settings
 from Onaeri import helper
-from Onaeri.logger import *
+from Onaeri.logger import log
 
 from pytradfri import Gateway, error
-from pytradfri.api.libcoap_api import APIFactory
 
 network = Network()
 
@@ -18,9 +17,9 @@ try:
     devices_commands = api(devices_command)
     devices = api(devices_commands)
 except error.RequestTimeout:
-    logError("Can't connect to Gateway.")
-    logError("Is the Gateway on and connected to the network?")
-    logError("Do you want to reset the Gateway settings? (y/n)")
+    log.error("Can't connect to Gateway.")
+    log.error("Is the Gateway on and connected to the network?")
+    log.error("Do you want to reset the Gateway settings? (y/n)")
     inp = input()
     if inp == "y":
         network.resetSettings()
@@ -33,8 +32,9 @@ light_objects = [dev for dev in devices if dev.has_light_control]
 light_ids = {}
 for l in light_objects:
     if l.name in light_ids:
-        logError("Two lamps have the exact same name. Please make all lamp names unique and try again.")
+        log.error("Two lamps have the exact same name. " +
+                  "Please make all lamp names unique and try again.")
         exit()
     light_ids[l.name] = l
 
-logSuccess("Done", end="\n\n")
+log.success("Done", end="\n\n")

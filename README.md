@@ -37,7 +37,7 @@ Run the correct setup file and watch the magic happen. The setup will install al
 Change the settings in the folder `Onaeri/settings`
 
 1. Create a cycle by making a new settings file using `Template.py` as a template. For example name it `Bedroom.py`.
-2. Change your bedtime (`userAlarmTime`), waketime (`userSleepTime`), and possibly other settings in the new `Bedroom.py` settings file.
+2. Change your bedtime (`alarmTime`), waketime (`sleepTime`), and possibly other settings in the new `Bedroom.py` settings file.
 3. Using the official Ikea Trådfri app change the names of your lamps to include the name of the settings file you made in the previous steps. In our example you could name one light `Bedroom ceiling` and another lamp in the same cycle could be `bedroom nightstand`.
 
 
