@@ -10,7 +10,7 @@ colorRange = (454, 250)  # [min, max] color temp. Unsigned int
 metrics = {'total': 0, 'success': 0, 'timeout': 0}
 
 
-def now():
+def poll():
     """
     Get info from all lamps from gateway.
     """

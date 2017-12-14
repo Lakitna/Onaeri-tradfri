@@ -149,8 +149,8 @@ class Network:
                 exit()
 
             # Ping entire subnet
-            subprocess.call("fping -c 1 -g %s/24 2> /dev/null " +
-                            "| grep HackToHideOutput" % ip,
+            subprocess.call("fping -c 1 -g %s/24 2> /dev/null " % ip +
+                            "| grep HackToHideOutput",
                             shell=True)
 
         def consultARP(regex):

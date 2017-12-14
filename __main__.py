@@ -15,7 +15,7 @@ from Onaeri import Onaeri, settings, __version__ as onaeriVersion
 import control
 import lampdata
 
-onaeri = Onaeri(lampdata.now())
+onaeri = Onaeri(lampdata.poll())
 restartTime = onaeri.time.code((3, 0), dry=True)
 updateCounter = 0
 
@@ -104,7 +104,7 @@ def heartbeat(state=True):
 while True:
     try:
         heartbeat(True)
-        lampData = lampdata.now()
+        lampData = lampdata.poll()
         heartbeat(False)
 
         # Progress all cycles and pass the current state of all lamps
