@@ -15,9 +15,23 @@ from Onaeri import Onaeri, settings, __version__ as onaeriVersion
 import control
 import lampdata
 
-onaeri = Onaeri(lampdata.poll())
+firstLampData = lampdata.poll(True)
+onaeri = Onaeri(firstLampData)
 restartTime = onaeri.time.code((3, 0), dry=True)
 updateCounter = 0
+
+features = {1: "dim", 2: "temp", 8: "color"}
+for lamp in firstLampData:
+    feat = {}
+    for f in features:
+        if lamp.features & f:
+            feat[features[f]] = True
+        else:
+            feat[features[f]] = False
+
+    settings.dynamic.set(lamp.name,
+                         "features",
+                         feat)
 
 log()
 log.row()
@@ -43,8 +57,7 @@ def summaryBuild():
         return val
 
     version = {}
-    import Onaeri
-    version['Onaeri API'] = Onaeri.__version__
+    version['Onaeri API'] = onaeriVersion
     version['Onaeri Tradfri'] = __version__
 
     time = {}
