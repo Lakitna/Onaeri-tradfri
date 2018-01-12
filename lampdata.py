@@ -8,8 +8,22 @@ from pytradfri import error
 
 briRange = (1, 254)
 colorRange = (454, 250)
+hueRange = (0, 64800)
+satRange = (0, 65279)
+satCorrect = (626, 347)
+featureReference = {1: "dim", 2: "temp", 8: "color"}
 metrics = {'total': 0, 'success': 0, 'timeout': 0}
 unreachable = []
+
+
+def _defineFeatures(light):
+    ret = {}
+    for f in featureReference:
+        if light.supported_features & f:
+            ret[featureReference[f]] = True
+        else:
+            ret[featureReference[f]] = False
+    return ret
 
 
 def poll(first=False):
@@ -44,16 +58,24 @@ def poll(first=False):
                 log.warn("Unreachable devices: %s" % unreachable)
 
         if first:
-            features = light.supported_features
+            features = _defineFeatures(light)
         else:
             features = None
 
+        saturation = helper.scale(light.hsb_xy_color[1], satRange, valRange)
+        colorTemp = helper.scale(light.color_temp, colorRange, valRange)
+        if colorTemp is None:
+            if helper.inRange(saturation, satCorrect):
+                colorTemp = helper.scale(saturation, satCorrect, valRange)
+
         ret.append(Lamp(
                    helper.scale(light.dimmer, briRange, valRange),
-                   helper.scale(light.color_temp, colorRange, valRange),
+                   colorTemp,
                    power,
                    name=device.name,
-                   features=features
+                   features=features,
+                   hue=helper.scale(light.hsb_xy_color[0], hueRange, valRange),
+                   sat=saturation,
                    ))
 
     metrics['success'] += 1

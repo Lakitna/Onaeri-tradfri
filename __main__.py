@@ -20,19 +20,6 @@ onaeri = Onaeri(firstLampData)
 restartTime = onaeri.time.code((3, 0), dry=True)
 updateCounter = 0
 
-features = {1: "dim", 2: "temp", 8: "color"}
-for lamp in firstLampData:
-    feat = {}
-    for f in features:
-        if lamp.features & f:
-            feat[features[f]] = True
-        else:
-            feat[features[f]] = False
-
-    settings.dynamic.set(lamp.name,
-                         "features",
-                         feat)
-
 log()
 log.row()
 log("RUNTIME STARTED")
@@ -91,15 +78,7 @@ def summaryBuild():
 
 
 atexit.register(summaryBuild)
-
-
-def restart():
-    """
-    Restart entire program if the time is right
-    """
-    if onaeri.time.latestCode == restartTime and onaeri.time.runtime > 0:
-        summaryBuild()
-        os.execl(sys.executable, sys.executable, *sys.argv)
+onaeri.scheduler.add((23, 59), summaryBuild, "Daily runtime summary")
 
 
 def heartbeat(state=True):
@@ -129,18 +108,16 @@ while True:
 
             for cycle in onaeri.cycles:
                 for id in cycle.lamp:
-                    if not cycle.lamp[id].isEmpty(['brightness',
-                                                   'color',
-                                                   'power']):
+                    if not cycle.lamp[id].isEmpty(['brightness', 'color',
+                                                   'power', 'hue', 'sat']):
                         print("\t%s: %s" % (cycle.name, cycle.lamp[id]))
 
             heartbeat(True)
             control.color(onaeri)
+            # control.sat(onaeri)
             control.brightness(onaeri)
             control.power(onaeri)
             heartbeat(False)
-
-        restart()
 
         # Slow down a bit, no stress brah
         sleep(settings.Global.mainLoopDelay)
