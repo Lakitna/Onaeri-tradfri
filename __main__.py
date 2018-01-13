@@ -15,9 +15,7 @@ from Onaeri import Onaeri, settings, __version__ as onaeriVersion
 import control
 import lampdata
 
-firstLampData = lampdata.poll(True)
-onaeri = Onaeri(firstLampData)
-restartTime = onaeri.time.code((3, 0), dry=True)
+onaeri = Onaeri(lampdata.poll(True))
 updateCounter = 0
 
 log()
@@ -110,11 +108,10 @@ while True:
                 for id in cycle.lamp:
                     if not cycle.lamp[id].isEmpty(['brightness', 'color',
                                                    'power', 'hue', 'sat']):
-                        print("\t%s: %s" % (cycle.name, cycle.lamp[id]))
+                        print("\t%s: %s" % (id, cycle.lamp[id]))
 
             heartbeat(True)
             control.color(onaeri)
-            # control.sat(onaeri)
             control.brightness(onaeri)
             control.power(onaeri)
             heartbeat(False)

@@ -72,6 +72,25 @@ def color(api):
         _sendCommand(command)
         metrics['color'] += 1
 
+    def set_hsb(cycle, id):
+        h = helper.scale(cycle.lamp[id].hue,
+                         settings.Global.valRange,
+                         hueRange)
+        s = helper.scale(cycle.lamp[id].sat,
+                         settings.Global.valRange,
+                         satRange)
+        b = helper.scale(cycle.lamp[id].brightness,
+                         settings.Global.valRange,
+                         briRange)
+
+        lamp = com.light_ids[id]
+        command = lamp.light_control.set_hsb(
+            h, s, b,
+            transition_time=settings.Global.transitionTime * 10
+        )
+        _sendCommand(command)
+        metrics['color'] += 1
+
     update = False
     for cycle in api.cycles:
         if cycle.update:
@@ -81,6 +100,10 @@ def color(api):
                         set_temp(cycle, id)
                     if cycle.lamp[id].features['color'] is True:
                         set_color(cycle, id)
+                    update = True
+                elif (cycle.lamp[id].hue is not None
+                      and cycle.lamp[id].sat is not None):
+                    set_hsb(cycle, id)
                     update = True
     if update:
         time.sleep(settings.Global.transitionTime)

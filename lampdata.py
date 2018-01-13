@@ -8,10 +8,10 @@ from pytradfri import error
 
 briRange = (1, 254)
 colorRange = (454, 250)
-hueRange = (0, 64800)
+hueRange = (0, 65535)
 satRange = (0, 65279)
 satCorrect = (626, 347)
-featureReference = {1: "dim", 2: "temp", 8: "color"}
+featureReference = {1: 'dim', 2: 'temp', 8: 'color'}
 metrics = {'total': 0, 'success': 0, 'timeout': 0}
 unreachable = []
 
