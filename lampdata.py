@@ -54,13 +54,17 @@ def setup():
     """
     Setup observing threads and return the first lampData
     """
+    log("Subscribing to lamp changes: ", end="", flush=True)
     for i in range(len(light_objects)):
         thread = ObserverThread(i, light_objects[i])
         thread.start()
 
         threadList.append(thread)
         metrics['threads'].append(thread.device.name)
+        time.sleep(0.2)
 
+    log.success("Done")
+    log()
     return poll(True)
 
 
