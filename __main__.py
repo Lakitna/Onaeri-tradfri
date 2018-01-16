@@ -15,7 +15,7 @@ from Onaeri import Onaeri, settings, __version__ as onaeriVersion
 import control
 import lampdata
 
-onaeri = Onaeri(lampdata.poll(True))
+onaeri = Onaeri(lampdata.setup())
 updateCounter = 0
 
 log()
@@ -53,9 +53,7 @@ def summaryBuild():
                           * settings.Global.minPerTimeCode) / 60, 2)
 
     observer = lampdata.metrics
-    observer["success rate"] = round((observer['success']
-                                     / observer['total']) * 100, 2)
-    observer['success rate'] = colorSuccessRate(observer['success rate'])
+    observer['thread_count'] = len(observer['threads'])
 
     ctrl = control.metrics
     try:
@@ -85,17 +83,14 @@ def heartbeat(state=True):
     """
     if state:
         print("\033[1;31m♥\033[0;0m\b", end="", flush=True)
-        return
     else:
         print(" \b", end="", flush=True)
-        return
+    return
 
 
 while True:
     try:
-        heartbeat(True)
         lampData = lampdata.poll()
-        heartbeat(False)
 
         # Progress all cycles and pass the current state of all lamps
         onaeri.tick(lampData)

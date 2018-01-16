@@ -4,6 +4,8 @@ from Onaeri.logger import log
 from Onaeri.settings.Global import valRange
 from com import light_objects, api
 from pytradfri import error
+import threading
+import time
 
 
 briRange = (1, 254)
@@ -12,11 +14,60 @@ hueRange = (0, 65535)
 satRange = (0, 65279)
 satCorrect = (626, 347)
 featureReference = {1: 'dim', 2: 'temp', 8: 'color'}
-metrics = {'total': 0, 'success': 0, 'timeout': 0}
+metrics = {'threads': [], 'thread_stopped': 0, 'thread_started': 0,
+           'thread_callback': 0, 'poll_total': 0}
 unreachable = []
+threadList = []
+
+
+class ObserverThread(threading.Thread):
+    def __init__(self, threadID, device):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = "Thread-%d" % threadID
+        self.daemon = True
+        self.device = device
+
+    def run(self):
+        """
+        Thread runtime
+        """
+        while True:
+            metrics['thread_started'] += 1
+            api(self.device.observe(self._callback,
+                                    self._err_callback,
+                                    duration=3600))
+            time.sleep(.01)  # Stability delay
+
+    def _callback(self, device):
+        """Lamp change callback"""
+        self.device = device
+        metrics['thread_callback'] += 1
+        # print("Received message for: %s" % self.device)
+
+    def _err_callback(self, err):
+        """Observing stopped callback"""
+        metrics['thread_stopped'] += 1
+
+
+def setup():
+    """
+    Setup observing threads and return the first lampData
+    """
+    for i in range(len(light_objects)):
+        thread = ObserverThread(i, light_objects[i])
+        thread.start()
+
+        threadList.append(thread)
+        metrics['threads'].append(thread.device.name)
+
+    return poll(True)
 
 
 def _defineFeatures(light):
+    """
+    Restructure features to Onaeri specs
+    """
     ret = {}
     for f in featureReference:
         if light.supported_features & f:
@@ -30,22 +81,15 @@ def poll(first=False):
     """
     Get info from all lamps from gateway.
     """
-    metrics['total'] += 1
-    ret = []
-    for device in light_objects:
-        try:
-            command = device.update()
-            command._timeout = 3
-            api(command)
-        except error.RequestTimeout:
-            print("×")
-            metrics['timeout'] += 1
-            return None
+    if len(threadList) != len(light_objects):
+        log.warn("[lampData] Threadcount discrepancy: %s"
+                 % {"threads": len(threadList), "lamps": len(light_objects)})
 
-        try:
-            light = device.light_control.lights[0]
-        except TypeError:
-            log.error("A lamp has been removed from the network")
+    metrics['poll_total'] += 1
+    ret = []
+    for thread in threadList:
+        device = thread.device
+        light = device.light_control.lights[0]
 
         power = False
         if device.reachable:
@@ -78,5 +122,4 @@ def poll(first=False):
                    sat=saturation,
                    ))
 
-    metrics['success'] += 1
     return ret
