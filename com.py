@@ -37,4 +37,4 @@ for l in light_objects:
         exit()
     light_ids[l.name] = l
 
-log.success("Done", end="\n\n")
+log.success("Done")

@@ -169,7 +169,6 @@ class Network:
                 return None
 
             # Find ip4 address in arp record
-    # regex = re.compile('([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})')
             regex = re.compile('(([0-9]{1,3}\.){3}[0-9]{1,3})')
             match = regex.search(arpRecord)
 
