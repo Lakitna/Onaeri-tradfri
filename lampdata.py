@@ -1,17 +1,15 @@
 from Onaeri.lamp import Lamp
-from Onaeri import helper
+from Onaeri.helper import scale, inRange
 from Onaeri.logger import log
 from Onaeri.settings.Global import valRange
 from com import light_objects, api
 from pytradfri import error
+from pytradfri.const import (
+    RANGE_HUE, RANGE_SATURATION, RANGE_BRIGHTNESS, RANGE_MIREDS)
 import threading
 import time
 
 
-briRange = (1, 254)
-colorRange = (454, 250)
-hueRange = (0, 65535)
-satRange = (0, 65279)
 satCorrect = (626, 347)
 featureReference = {1: 'dim', 2: 'temp', 8: 'color'}
 metrics = {'threads': [], 'thread_stopped': 0, 'thread_started': 0,
@@ -29,9 +27,7 @@ class ObserverThread(threading.Thread):
         self.device = device
 
     def run(self):
-        """
-        Thread runtime
-        """
+        """Thread runtime"""
         while True:
             metrics['thread_started'] += 1
             api(self.device.observe(self._callback,
@@ -61,7 +57,7 @@ def setup():
 
         threadList.append(thread)
         metrics['threads'].append(thread.device.name)
-        time.sleep(0.2)
+        time.sleep(0.2)  # Stability delay
 
     log.success("Done")
     log()
@@ -110,20 +106,29 @@ def poll(first=False):
         else:
             features = None
 
-        saturation = helper.scale(light.hsb_xy_color[1], satRange, valRange)
-        colorTemp = helper.scale(light.color_temp, colorRange, valRange)
+        hue = scale(light.hsb_xy_color[0],
+                    RANGE_HUE,
+                    valRange)
+        saturation = scale(light.hsb_xy_color[1],
+                           RANGE_SATURATION,
+                           valRange)
+        brightness = scale(light.dimmer,
+                           RANGE_BRIGHTNESS,
+                           valRange)
+        colorTemp = scale(light.color_temp,
+                          RANGE_MIREDS,
+                          valRange)
         if colorTemp is None:
-            if helper.inRange(saturation, satCorrect):
-                colorTemp = helper.scale(saturation, satCorrect, valRange)
+            if inRange(saturation, satCorrect):
+                colorTemp = scale(saturation, satCorrect, valRange)
 
         ret.append(Lamp(
-                   helper.scale(light.dimmer, briRange, valRange),
-                   colorTemp,
-                   power,
+                   brightness=brightness,
+                   color=colorTemp,
+                   power=power,
                    name=device.name,
                    features=features,
-                   hue=helper.scale(light.hsb_xy_color[0], hueRange, valRange),
-                   sat=saturation,
-                   ))
+                   hue=hue,
+                   sat=saturation))
 
     return ret
