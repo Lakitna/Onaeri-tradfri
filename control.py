@@ -134,3 +134,35 @@ def _sendCommand(command, iteration=1):
         metrics['timeout'] += 1
         if iteration < settings.Global.commandsTries:
             _sendCommand(command, iteration=iteration + 1)
+
+
+def _miredToXY(mired):
+    """
+    Planckian locus approximation function
+    http://en.wikipedia.org/wiki/Planckian_locus#Approximation
+    """
+    # Mired to kelvin
+    T = float(1000000 / mired)
+
+    if 1667 <= T <= 4000:
+        x = (-0.2661239 * (10**9 / T**3) - 0.2343580 * (10**6 / T**2)
+             + 0.8776956 * (10**3 / T) + 0.179910)
+    elif 4000 <= T <= 25000:
+        x = (-3.0258469 * (10**9 / T**3) + 2.107379 * (10**6 / T**2)
+             + 0.2226347 * (10**3 / T) + 0.240390)
+    else:
+        raise ValueError("T out of range")
+
+    if 1667 <= T <= 2222:
+        y = (-1.1063814 * x**3 - 1.34811020 * x**2
+             + 2.18555832 * x - 0.20219683)
+    elif 2222 <= T <= 4000:
+        y = (-0.9549476 * x**3 - 1.37418593 * x**2
+             + 2.09137015 * x - 0.16748867)
+    elif 4000 <= T <= 25000:
+        y = (3.0817580 * x**3 - 5.87338670 * x**2
+             + 3.75112997 * x - 0.37001483)
+    else:
+        raise ValueError("T out of range")
+
+    return (x, y)
