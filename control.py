@@ -1,14 +1,14 @@
 from sys import exc_info
 import time
-
 from pytradfri import error
 from pytradfri.const import (
     RANGE_HUE, RANGE_SATURATION, RANGE_BRIGHTNESS,
     RANGE_MIREDS, RANGE_X, RANGE_Y)
 from com import light_ids, api
-from Onaeri.settings.Global import valRange, transitionTime
-from Onaeri.helper import scale
-from Onaeri.logger import log
+from Onaeri import helper, logger, settings
+valRange = settings.Global.valRange
+transitionTime = settings.Global.transitionTime
+log = logger.log
 
 metrics = {'brightness': 0, 'color': 0, 'sat': 0, 'power': 0,
            'timeout': 0, 'total': 0}
@@ -43,7 +43,7 @@ def color(api):
     """
     def set_temp(cycle, id):
         """White spectrum bulb"""
-        val = scale(cycle.lamp[id].color, valRange, RANGE_MIREDS)
+        val = helper.scale(cycle.lamp[id].color, valRange, RANGE_MIREDS)
         command = light_ids[id].light_control.set_color_temp(
             val,
             transition_time=transitionTime * 10
@@ -53,10 +53,10 @@ def color(api):
 
     def set_color(cycle, id):
         """Color bulb, set color temperature"""
-        mired = scale(cycle.lamp[id].color, valRange, RANGE_MIREDS)
+        mired = helper.scale(cycle.lamp[id].color, valRange, RANGE_MIREDS)
         xy = _miredToXY(mired)
-        x = scale(xy[0], (0, 1), RANGE_X)
-        y = scale(xy[1], (0, 1), RANGE_Y)
+        x = helper.scale(xy[0], (0, 1), RANGE_X)
+        y = helper.scale(xy[1], (0, 1), RANGE_Y)
         command = light_ids[id].light_control.set_xy_color(
             x, y,
             transition_time=transitionTime * 10
@@ -66,9 +66,9 @@ def color(api):
 
     def set_hsb(cycle, id):
         """Color bulb, set color"""
-        h = scale(cycle.lamp[id].hue, valRange, RANGE_HUE)
-        s = scale(cycle.lamp[id].sat, valRange, RANGE_SATURATION)
-        b = scale(cycle.lamp[id].brightness, valRange, RANGE_BRIGHTNESS)
+        h = helper.scale(cycle.lamp[id].hue, valRange, RANGE_HUE)
+        s = helper.scale(cycle.lamp[id].sat, valRange, RANGE_SATURATION)
+        b = helper.scale(cycle.lamp[id].brightness, valRange, RANGE_BRIGHTNESS)
         command = light_ids[id].light_control.set_hsb(
             h, s, b,
             transition_time=transitionTime * 10
@@ -103,7 +103,9 @@ def brightness(api):
     Update the brightness of one or more lamps in one or more cycles.
     """
     def set(cycle, id):
-        val = scale(cycle.lamp[id].brightness, valRange, RANGE_BRIGHTNESS)
+        val = helper.scale(cycle.lamp[id].brightness,
+                           valRange,
+                           RANGE_BRIGHTNESS)
         command = light_ids[id].light_control.set_dimmer(
             val,
             transition_time=transitionTime * 10

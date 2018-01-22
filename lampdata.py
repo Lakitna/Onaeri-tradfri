@@ -1,14 +1,12 @@
-from Onaeri.lamp import Lamp
-from Onaeri.helper import scale, inRange
-from Onaeri.logger import log
-from Onaeri.settings.Global import valRange
 from com import light_objects, api
 from pytradfri import error
 from pytradfri.const import (
     RANGE_HUE, RANGE_SATURATION, RANGE_BRIGHTNESS, RANGE_MIREDS)
 import threading
 import time
-
+from Onaeri import lamp, helper, logger, settings
+log = logger.log
+valRange = settings.Global.valRange
 
 satCorrect = (626, 347)
 featureReference = {1: 'dim', 2: 'temp', 8: 'color'}
@@ -106,23 +104,23 @@ def poll(first=False):
         else:
             features = None
 
-        hue = scale(light.hsb_xy_color[0],
-                    RANGE_HUE,
-                    valRange)
-        saturation = scale(light.hsb_xy_color[1],
-                           RANGE_SATURATION,
+        hue = helper.scale(light.hsb_xy_color[0],
+                           RANGE_HUE,
                            valRange)
-        brightness = scale(light.dimmer,
-                           RANGE_BRIGHTNESS,
-                           valRange)
-        colorTemp = scale(light.color_temp,
-                          RANGE_MIREDS,
-                          valRange)
+        saturation = helper.scale(light.hsb_xy_color[1],
+                                  RANGE_SATURATION,
+                                  valRange)
+        brightness = helper.scale(light.dimmer,
+                                  RANGE_BRIGHTNESS,
+                                  valRange)
+        colorTemp = helper.scale(light.color_temp,
+                                 RANGE_MIREDS,
+                                 valRange)
         if colorTemp is None:
-            if inRange(saturation, satCorrect):
-                colorTemp = scale(saturation, satCorrect, valRange)
+            if helper.inRange(saturation, satCorrect):
+                colorTemp = helper.scale(saturation, satCorrect, valRange)
 
-        ret.append(Lamp(
+        ret.append(lamp.Lamp(
                    brightness=brightness,
                    color=colorTemp,
                    power=power,

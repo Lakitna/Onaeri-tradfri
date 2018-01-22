@@ -10,10 +10,10 @@ import os
 import traceback
 import atexit
 from time import sleep, strftime
-from Onaeri.logger import log
-from Onaeri import Onaeri, settings, __version__ as onaeriVersion
 import control
 import lampdata
+from Onaeri import logger, Onaeri, settings, __version__ as onaeriVersion
+log = logger.log
 
 onaeri = Onaeri(lampdata.setup())
 updateCounter = 0

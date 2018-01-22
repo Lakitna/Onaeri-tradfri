@@ -1,9 +1,7 @@
 from network import Network
-import Onaeri.settings as settings
-from Onaeri import helper
-from Onaeri.logger import log
-
 from pytradfri import Gateway, error
+from Onaeri import settings, helper, logger
+log = logger.log
 
 network = Network()
 

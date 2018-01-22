@@ -3,10 +3,10 @@ import uuid
 import socket
 import subprocess
 import re
-from Onaeri import helper
-from Onaeri.logger import log
 from pytradfri.api.libcoap_api import APIFactory
 from pytradfri import error
+from Onaeri import helper, logger
+log = logger.log
 
 # Clear termnial window
 print(chr(27) + "[2J")
