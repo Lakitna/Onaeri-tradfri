@@ -5,8 +5,7 @@ import subprocess
 import re
 from pytradfri.api.libcoap_api import APIFactory
 from pytradfri import error
-from Onaeri import helper, logger
-log = logger.log
+from Onaeri.Onaeri.logger import log
 
 # Clear termnial window
 print(chr(27) + "[2J")

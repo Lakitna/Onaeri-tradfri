@@ -5,10 +5,10 @@ from pytradfri.const import (
     RANGE_HUE, RANGE_SATURATION, RANGE_BRIGHTNESS,
     RANGE_MIREDS, RANGE_X, RANGE_Y)
 from com import light_ids, api
-from Onaeri import helper, logger, settings
-valRange = settings.Global.valRange
-transitionTime = settings.Global.transitionTime
-log = logger.log
+from Onaeri.Onaeri import helper
+from Onaeri.Onaeri.logger import log
+from Onaeri.Onaeri.settings.Global import (
+    valRange, transitionTime, commandsTries)
 
 metrics = {'brightness': 0, 'color': 0, 'sat': 0, 'power': 0,
            'timeout': 0, 'total': 0}
@@ -134,7 +134,7 @@ def _sendCommand(command, iteration=1):
     except error.RequestTimeout:
         log.warn("[Control] Timeout error on try %d" % iteration)
         metrics['timeout'] += 1
-        if iteration < settings.Global.commandsTries:
+        if iteration < commandsTries:
             _sendCommand(command, iteration=iteration + 1)
 
 

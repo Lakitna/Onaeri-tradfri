@@ -4,9 +4,9 @@ from pytradfri.const import (
     RANGE_HUE, RANGE_SATURATION, RANGE_BRIGHTNESS, RANGE_MIREDS)
 import threading
 import time
-from Onaeri import lamp, helper, logger, settings
-log = logger.log
-valRange = settings.Global.valRange
+from Onaeri.Onaeri import lamp, helper
+from Onaeri.Onaeri.logger import log
+from Onaeri.Onaeri.settings.Global import valRange
 
 satCorrect = (626, 347)
 featureReference = {1: 'dim', 2: 'temp', 8: 'color'}
