@@ -148,7 +148,7 @@ class Network:
                 exit()
 
             # Ping entire subnet
-            subprocess.call("fping -c 1 -g %s/24 2> /dev/null " % ip +
+            subprocess.call("fping -c 1 -r 1 -g %s/24 " % ip +
                             "| grep HackToHideOutput",
                             shell=True)
 
@@ -182,6 +182,8 @@ class Network:
 
         # First attempt at finding gateway by looking for its name
         ip = consultARP("gw\-[a-z0-9]{12}")
+        if ip is None:
+            ip = consultARP("tradfri\-gateway\-[a-z0-9]{12}")
 
         if ip is None:
             if len(self._settings['mac']) < 2:  # If mac address is unkown
