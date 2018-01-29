@@ -148,7 +148,7 @@ class Network:
                 exit()
 
             # Ping entire subnet
-            subprocess.call("fping -c 1 -r 1 -g %s/24 " % ip +
+            subprocess.call("fping -c 1 -r 1 -g %s/24 2> /dev/null " % ip +
                             "| grep HackToHideOutput",
                             shell=True)
 
