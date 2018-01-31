@@ -30,15 +30,15 @@ log()
 def summaryBuild():
     def colorSuccessRate(val):
         if val < 80:
-            return "%s #superLow" % val
+            return "%s%% #superLow" % val
         if val < 90:
-            return "%s #low" % val
+            return "%s%% #low" % val
         if val < 95:
-            return "%s #ok" % val
+            return "%s%% #ok" % val
         if val > 98:
-            return "%s #awesome" % val
+            return "%s%% #awesome" % val
         if val >= 95:
-            return "%s #good" % val
+            return "%s%% #good" % val
         return val
 
     version = {}
@@ -53,7 +53,7 @@ def summaryBuild():
                           * settings.Global.minPerTimeCode) / 60, 2)
 
     observer = lampdata.metrics
-    observer['thread_count'] = len(observer['threads'])
+    observer['thread count'] = len(observer['threads'])
 
     ctrl = control.metrics
     try:

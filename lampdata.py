@@ -10,8 +10,8 @@ from Onaeri.Onaeri.settings.Global import valRange
 
 satCorrect = (626, 347)
 featureReference = {1: 'dim', 2: 'temp', 8: 'color'}
-metrics = {'threads': [], 'thread_stopped': 0, 'thread_started': 0,
-           'thread_callback': 0, 'poll_total': 0}
+metrics = {'threads': [], 'thread stopped': 0, 'thread started': 0,
+           'thread callback': 0, 'poll total': 0}
 unreachable = []
 threadList = []
 
@@ -27,7 +27,7 @@ class ObserverThread(threading.Thread):
     def run(self):
         """Thread runtime"""
         while True:
-            metrics['thread_started'] += 1
+            metrics['thread started'] += 1
             api(self.device.observe(self._callback,
                                     self._err_callback,
                                     duration=3600))
@@ -36,12 +36,12 @@ class ObserverThread(threading.Thread):
     def _callback(self, device):
         """Lamp change callback"""
         self.device = device
-        metrics['thread_callback'] += 1
+        metrics['thread callback'] += 1
         # print("Received message for: %s" % self.device)
 
     def _err_callback(self, err):
         """Observing stopped callback"""
-        metrics['thread_stopped'] += 1
+        metrics['thread stopped'] += 1
 
 
 def setup():
@@ -83,7 +83,7 @@ def poll(first=False):
         log.warn("[lampData] Threadcount discrepancy: %s"
                  % {"threads": len(threadList), "lamps": len(light_objects)})
 
-    metrics['poll_total'] += 1
+    metrics['poll total'] += 1
     ret = []
     for thread in threadList:
         device = thread.device
