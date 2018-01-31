@@ -114,7 +114,7 @@ def poll(first=False):
                                   RANGE_BRIGHTNESS,
                                   valRange)
         colorTemp = helper.scale(light.color_temp,
-                                 RANGE_MIREDS,
+                                 (RANGE_MIREDS[1], RANGE_MIREDS[0]),
                                  valRange)
         if colorTemp is None:
             if helper.inRange(saturation, satCorrect):
