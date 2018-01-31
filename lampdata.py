@@ -8,7 +8,6 @@ from Onaeri.Onaeri import lamp, helper
 from Onaeri.Onaeri.logger import log
 from Onaeri.Onaeri.settings.Global import valRange
 
-satCorrect = (626, 347)
 featureReference = {1: 'dim', 2: 'temp', 8: 'color'}
 metrics = {'threads': [], 'thread stopped': 0, 'thread started': 0,
            'thread callback': 0, 'poll total': 0}
@@ -26,22 +25,27 @@ class ObserverThread(threading.Thread):
 
     def run(self):
         """Thread runtime"""
+        log.blind(self.device.name, self.name)
         while True:
             metrics['thread started'] += 1
+            log.blind(">>", self.name, end="")
             api(self.device.observe(self._callback,
                                     self._err_callback,
-                                    duration=3600))
+                                    duration=(1800 + self.threadID)))
+            log.blind("<<", self.name)
             time.sleep(.01)  # Stability delay
 
     def _callback(self, device):
         """Lamp change callback"""
         self.device = device
         metrics['thread callback'] += 1
+        log.blind("!", self.name, end="")
         # print("Received message for: %s" % self.device)
 
     def _err_callback(self, err):
         """Observing stopped callback"""
         metrics['thread stopped'] += 1
+        log.blind("X", self.name, end="")
 
 
 def setup():
@@ -116,9 +120,6 @@ def poll(first=False):
         colorTemp = helper.scale(light.color_temp,
                                  (RANGE_MIREDS[1], RANGE_MIREDS[0]),
                                  valRange)
-        if colorTemp is None:
-            if helper.inRange(saturation, satCorrect):
-                colorTemp = helper.scale(saturation, satCorrect, valRange)
 
         ret.append(lamp.Lamp(
                    brightness=brightness,
