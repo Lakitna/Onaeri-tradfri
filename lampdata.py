@@ -22,30 +22,30 @@ class ObserverThread(threading.Thread):
         self.name = "Thread-%d" % threadID
         self.daemon = True
         self.device = device
+        self.logFile = "Thread-%s" % self.device.name
 
     def run(self):
         """Thread runtime"""
-        log.blind(self.device.name, self.name)
         while True:
             metrics['thread started'] += 1
-            log.blind(">>", self.name, end="")
+            log.blind("[time] >>", self.logFile, end="")
             api(self.device.observe(self._callback,
                                     self._err_callback,
                                     duration=(1800 + self.threadID)))
-            log.blind("<<", self.name)
+            log.blind("<< [time]", self.logFile)
             time.sleep(.01)  # Stability delay
 
     def _callback(self, device):
         """Lamp change callback"""
         self.device = device
         metrics['thread callback'] += 1
-        log.blind("!", self.name, end="")
+        log.blind("!", self.logFile, end="")
         # print("Received message for: %s" % self.device)
 
     def _err_callback(self, err):
         """Observing stopped callback"""
         metrics['thread stopped'] += 1
-        log.blind("X", self.name, end="")
+        log.blind("X", self.logFile, end="")
 
 
 def setup():
