@@ -1,5 +1,4 @@
 from com import light_objects, api
-from pytradfri import error
 from pytradfri.const import (
     RANGE_HUE, RANGE_SATURATION, RANGE_BRIGHTNESS, RANGE_MIREDS)
 import threading

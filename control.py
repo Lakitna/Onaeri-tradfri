@@ -1,4 +1,3 @@
-from sys import exc_info
 import time
 from pytradfri import error
 from pytradfri.const import (

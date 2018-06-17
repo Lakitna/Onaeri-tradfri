@@ -5,8 +5,6 @@ https://github.com/Lakitna/Onaeri-tradfri
 
 __version__ = '0.8.0'
 
-import sys
-import os
 import traceback
 import atexit
 from time import sleep, strftime
